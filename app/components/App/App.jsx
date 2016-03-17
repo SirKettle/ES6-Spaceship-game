@@ -6,6 +6,8 @@ import AppActions from '../../actions/AppActions';
 import ItemsStore from '../../stores/ItemsStore';
 import Body from '../Body/Body';
 import Footer from '../Footer/Footer';
+import Game from '../Game/Game';
+import KeyboardService from '../../services/Keyboard';
 
 function getAppState() {
   return {
@@ -14,49 +16,52 @@ function getAppState() {
   };
 }
 
-
-const keyDowns = Rx.Observable.fromEvent(document, 'keydown');
-const keyUps = Rx.Observable.fromEvent(document, 'keyup');
-const keyActions = Rx.Observable
-    .merge( keyDowns, keyUps )
-    .filter( () => {
-      const keysPressed = {};
-      return ( event ) => {
-        const key = event.key || event.which;
-        if ( event.type === 'keyup' ) {
-          delete keysPressed[key];
-          return true;
-        }
-        if ( event.type === 'keydown' ) {
-          if ( keysPressed[key] ) {
-            return false;
-          }
-          keysPressed[key] = true;
-          return true;
-        }
-      };
-    } );
-
 export default class App extends React.Component {
 
-  state = getAppState()
+  state = getAppState();
+
+  renderKeysDown = () => {
+    return Object.keys(this.state.keysDown)
+      .map( (keyCode) => {
+        const { display } = this.state.keysDown[ keyCode ];
+        return (
+          <span>{ display }</span>
+        );
+      });
+  }
+
+  renderConsoleOutput = () => {
+    // TODO: This needs to iterate through an array/object to output anything
+    // needed in the console
+    return (
+      <div>
+        <h3>Console</h3>
+        <p>Keys down: <strong>{ this.renderKeysDown() }</strong></p>
+      </div>
+    );
+  }
 
   componentDidMount() {
     ItemsStore.addChangeListener(this.onChange);
     AppActions.getItems();
 
 
-    const { keysDown } = this.state;
+    const { keysDown } = this.state || {};
 
-    this.subscription = keyActions.subscribe( (event) => {
-      const key = event.key || event.which;
-      console.log( event.type, key, event.keyIdentifier, event.code );
+    this.streams = {};
+
+    this.streams.keyboard = KeyboardService.stream.subscribe( (event) => {
+      const keyCode = event.key || event.which;
+      const character = String.fromCharCode(keyCode);
 
       if ( event.type === 'keyup' ) {
-        delete keysDown[key];
+        delete keysDown[keyCode];
       }
       if ( event.type === 'keydown' ) {
-        keysDown[key] = true;
+        keysDown[keyCode] = {
+          code: keyCode,
+          display: character
+        };
       }
 
       this.setState({
@@ -69,13 +74,11 @@ export default class App extends React.Component {
     ItemsStore.removeChangeListener(this.onChange);
   }
 
-
-
   componentWillMount() {
   }
 
   componentWillUnmount() {
-    this.subscription.dispose();
+    this.streams.keyboard.dispose();
   }
 
   onChange = () => {
@@ -83,11 +86,39 @@ export default class App extends React.Component {
   }
 
   render() {
+
+    const gameState = {
+      running: true,
+      score: {
+        score: 10
+      },
+      data: {
+        somethings: [ 1, 2, 3 ],
+        keysDown: this.state.keysDown
+      }
+    };
+
+    const canvasConfig = {
+      width: 600,
+      height: 400
+    };
+
+    const onCanvasClicked = ( event ) => {
+      console.log(event);
+    };
+
     return (
       <div className={styles.app}>
-        <p>{ Object.keys(this.state.keysDown).join(' - ') }</p>
+        <Game
+          gameState={ gameState }
+          canvas={ canvasConfig }
+          onCanvasClicked={ onCanvasClicked }
+        />
         <Body items={this.state.items} />
         <Footer />
+        <div class={ styles.console }>
+          { this.renderConsoleOutput() }
+        </div>
       </div>
     );
   }
