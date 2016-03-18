@@ -10,6 +10,7 @@ import Game from '../Game/Game';
 import KeyboardService from '../../services/Keyboard';
 import defaultKeyActions from '../../data/defaultKeyActions.json';
 import gameUtils from '../../util/game';
+import objectUtils from '../../util/object';
 
 function getAppState() {
   return {
@@ -22,10 +23,15 @@ export default class App extends React.Component {
 
   state = getAppState();
 
+  subscriptions = [];
+  keyCodeActionMap = {};
+
   renderKeysDown = () => {
     return Object.keys(this.state.keysDown)
       .map( (keyCode) => {
-        const { display } = this.state.keysDown[ keyCode ];
+        const { display, action } = this.state.keysDown[ keyCode ];
+
+        action();
         return (
           <span>{ display }</span>
         );
@@ -73,29 +79,25 @@ export default class App extends React.Component {
       }
     };
 
-    const keyCodeActionMap = {};
     const getSafeKey = ( num ) => `key_${num}`;
 
     Object.keys( defaultKeyActions ).forEach( ( key ) => {
       const codes = defaultKeyActions[key];
       codes.forEach( ( code ) => {
-        keyCodeActionMap[getSafeKey( code )] = actions[key];
+        this.setActionByKeyCode( code, actions[key] );
       });
     });
 
-    console.log(keyCodeActionMap);
+    console.log(this.keyCodeActionMap);
 
     const { keysDown } = this.state || {};
 
-    this.streams = {};
-
-    this.streams.keyboard = KeyboardService.stream.subscribe( (event) => {
+    const keyBoardSubscription = KeyboardService.stream.subscribe( (event) => {
       const keyCode = event.key || event.which;
       const character = String.fromCharCode(keyCode);
+      const actionFunc = this.getActionByKeyCode( keyCode );
 
-      if (!keyCodeActionMap[getSafeKey( keyCode )]) {
-        return;
-      }
+      if ( !actionFunc ) { return; }
 
       if ( event.type === 'keyup' ) {
         delete keysDown[keyCode];
@@ -103,10 +105,11 @@ export default class App extends React.Component {
       if ( event.type === 'keydown' ) {
         keysDown[keyCode] = {
           code: keyCode,
-          display: character
+          display: character,
+          action: actionFunc
         };
 
-        keyCodeActionMap[getSafeKey( keyCode )]();
+        // actionFunc();
       }
 
       event.preventDefault();
@@ -115,6 +118,16 @@ export default class App extends React.Component {
         keysDown: keysDown
       })
     });
+
+    this.subscriptions.push(keyBoardSubscription);
+  }
+
+  getActionByKeyCode = ( keyCode ) => {
+    return this.keyCodeActionMap[ objectUtils.getSafeKey( keyCode ) ];
+  }
+
+  setActionByKeyCode = ( keyCode, actionFunc ) => {
+    this.keyCodeActionMap[ objectUtils.getSafeKey( keyCode ) ] = actionFunc;
   }
 
   componentWillUnmount() {
@@ -125,7 +138,10 @@ export default class App extends React.Component {
   }
 
   componentWillUnmount() {
-    this.streams.keyboard.dispose();
+
+    this.subscriptions.forEach( ( subscription) => {
+      subscription.dispose();
+    });
   }
 
   onChange = () => {
@@ -154,6 +170,8 @@ export default class App extends React.Component {
       console.log(event);
     };
 
+        // <Body items={this.state.items} />
+        // <Footer />
     return (
       <div className={styles.app}>
         <Game
@@ -161,8 +179,6 @@ export default class App extends React.Component {
           canvas={ canvasConfig }
           onCanvasClicked={ onCanvasClicked }
         />
-        <Body items={this.state.items} />
-        <Footer />
         <div class={ styles.console }>
           { this.renderConsoleOutput() }
         </div>
