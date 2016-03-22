@@ -1,10 +1,10 @@
 
 import Rx from 'rx';
 
-const keyDowns = Rx.Observable.fromEvent(document, 'keydown');
-const keyUps = Rx.Observable.fromEvent(document, 'keyup');
-const keyActions = Rx.Observable
-  .merge( keyDowns, keyUps )
+const keyDownsStream = Rx.Observable.fromEvent(document, 'keydown');
+const keyUpsStream = Rx.Observable.fromEvent(document, 'keyup');
+const keyActionsStream = Rx.Observable
+  .merge( keyDownsStream, keyUpsStream )
   .filter( () => {
     const keysPressed = {};
     return ( event ) => {
@@ -24,7 +24,9 @@ const keyActions = Rx.Observable
   });
 
 const KeyboardService = {
-  stream: keyActions
+  streams: {
+    keyActions: keyActionsStream
+  }
 }
 
 export default KeyboardService;

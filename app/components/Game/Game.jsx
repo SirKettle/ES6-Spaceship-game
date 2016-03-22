@@ -8,6 +8,7 @@ export default class Game extends React.Component {
     gameState: React.PropTypes.shape({
       running: React.PropTypes.bool,
       score: React.PropTypes.object,
+      hero: React.PropTypes.object,
       data: React.PropTypes.object
     }).isRequired,
     canvas: React.PropTypes.shape({
@@ -18,10 +19,13 @@ export default class Game extends React.Component {
   }
 
   renderScene( ctx, canvas ) {
-    ctx.fillStyle = '#000000';
+    const { gameState } = this.props;
+    ctx.fillStyle = '#fafafa';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    canvasUtils.drawTriangle( ctx, 200, 300, 20, '#aa0000', 'up' );
+    // console.log(gameState);
+
+    canvasUtils.drawTriangle( ctx, gameState.hero.x, gameState.hero.y, 20, '#dddddd', 'up' );
 
     this.paintScore( ctx );
   }
@@ -29,20 +33,20 @@ export default class Game extends React.Component {
   paintScore ( ctx ) {
     const { gameState } = this.props;
     const score = gameState.score.score;
-    ctx.fillStyle = '#ffffff';
+    ctx.fillStyle = '#cccccc';
     ctx.font = 'bold 26px sans-serif';
-    ctx.fillText('Score: ' + score, 40, 43);
-  }
-
-  getCanvasWidth() {
-    return 900;
-  }
-
-  getCanvasHeight() {
-    return 800;
+    ctx.fillText('s: ' + score, 40, 43);
   }
 
   componentDidMount() {
+    const { canvas, onCanvasClicked } = this.props;
+    const canvasElem = this.refs.gameCanvas.getDOMNode();
+    const ctx = canvasElem.getContext('2d');
+
+    this.renderScene( ctx, canvas );
+  }
+
+  componentDidUpdate() {
     const { canvas, onCanvasClicked } = this.props;
     const canvasElem = this.refs.gameCanvas.getDOMNode();
     const ctx = canvasElem.getContext('2d');

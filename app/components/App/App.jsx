@@ -14,14 +14,32 @@ import objectUtils from '../../util/object';
 
 function getAppState() {
   return {
-    items: ItemsStore.getAll(),
-    keysDown: {}
+    items: ItemsStore.getAll()
   };
 }
 
 export default class App extends React.Component {
 
-  state = getAppState();
+  static propTypes = {
+    canvasConfig: React.PropTypes.shape({
+      width: React.PropTypes.number,
+      height: React.PropTypes.number
+    })
+  }
+
+  state = {
+    running: true,
+    score: {
+      score: 10
+    },
+    hero: {
+      speed: 20
+    },
+    data: {
+      somethings: [ 1, 2, 3 ]
+    },
+    keysDown: {}
+  }
 
   subscriptions = [];
   keyCodeActionMap = {};
@@ -31,10 +49,26 @@ export default class App extends React.Component {
       .map( (keyCode) => {
         const { display, action } = this.state.keysDown[ keyCode ];
 
-        action();
+        // action();
         return (
-          <span>{ display }</span>
+          <span key={ keyCode }>{ display }</span>
         );
+      });
+  }
+
+  loopTime = Date.now();
+
+  gameLoop = () => {
+
+    const lastLoopTime = this.loopTime;
+    this.loopTime = Date.now();
+
+    const delta = this.loopTime - lastLoopTime;
+
+    Object.keys(this.state.keysDown)
+      .forEach( (keyCode) => {
+        const { action } = this.state.keysDown[ keyCode ];
+        action(delta);
       });
   }
 
@@ -55,21 +89,52 @@ export default class App extends React.Component {
 
     console.log(defaultKeyActions);
 
+    const { hero } = this.state;
+    const { canvasConfig } = this.props;
+
+    hero.x = 300;
+    hero.y = 300;
+    hero.shotCount = 0;
+
+    const moveHero ( hero, direction, delta ) => {
+
+      const distance = hero.speed * delta / 1000;
+
+      switch (direction) {
+        case 'left':
+          const desiredPosition = hero.x - distance;
+          hero.x = Math.max(0, desiredPosition);
+        case 'right':
+          const desiredPosition = hero.x + distance;
+          hero.x = Math.min(canvasConfig.width, desiredPosition);
+        case 'up':
+          const desiredPosition = hero.y - distance;
+          hero.y = Math.max(0, desiredPosition);
+        case 'down':
+          const desiredPosition = hero.y + distance;
+          hero.y = Math.min(canvasConfig.width, desiredPosition);
+      }
+
+      return hero;
+    }
+
     const actions = {
-      left: () => {
-        console.log('go left');
+      left: ( delta ) => {
+        hero = moveHero( hero, 'left', delta);
       },
-      right: () => {
-        console.log('go right');
+      right: ( delta ) => {
+        hero = moveHero( hero, 'right', delta);
       },
-      up: () => {
-        console.log('move up');
+      up: ( delta ) => {
+        hero = moveHero( hero, 'up', delta);
       },
-      down: () => {
-        console.log('move down');
+      down: ( delta ) => {
+        hero = moveHero( hero, 'down', delta);
       },
-      fire: () => {
-        console.log('fire!');
+      fire: ( delta ) => {
+        // console.log('fire!');
+        hero.shotCount++;
+        console.log('hero.shotCount', hero.shotCount);
       },
       pause: () => {
         console.log('pause');
@@ -78,6 +143,11 @@ export default class App extends React.Component {
         console.log('roll - ' + gameUtils.rollDice());
       }
     };
+
+    this.setState({
+      hero: hero
+    });
+
 
     const getSafeKey = ( num ) => `key_${num}`;
 
@@ -92,7 +162,7 @@ export default class App extends React.Component {
 
     const { keysDown } = this.state || {};
 
-    const keyBoardSubscription = KeyboardService.stream.subscribe( (event) => {
+    const keyBoardSubscription = KeyboardService.streams.keyActions.subscribe( (event) => {
       const keyCode = event.key || event.which;
       const character = String.fromCharCode(keyCode);
       const actionFunc = this.getActionByKeyCode( keyCode );
@@ -108,18 +178,18 @@ export default class App extends React.Component {
           display: character,
           action: actionFunc
         };
-
-        // actionFunc();
       }
 
       event.preventDefault();
 
       this.setState({
         keysDown: keysDown
-      })
+      });
     });
 
     this.subscriptions.push(keyBoardSubscription);
+
+    window.setInterval(this.gameLoop, 500);
   }
 
   getActionByKeyCode = ( keyCode ) => {
@@ -150,22 +220,6 @@ export default class App extends React.Component {
 
   render() {
 
-    const gameState = {
-      running: true,
-      score: {
-        score: 10
-      },
-      data: {
-        somethings: [ 1, 2, 3 ],
-        keysDown: this.state.keysDown
-      }
-    };
-
-    const canvasConfig = {
-      width: 600,
-      height: 400
-    };
-
     const onCanvasClicked = ( event ) => {
       console.log(event);
     };
@@ -175,8 +229,8 @@ export default class App extends React.Component {
     return (
       <div className={styles.app}>
         <Game
-          gameState={ gameState }
-          canvas={ canvasConfig }
+          gameState={ this.state }
+          canvas={ this.props.canvasConfig }
           onCanvasClicked={ onCanvasClicked }
         />
         <div class={ styles.console }>
