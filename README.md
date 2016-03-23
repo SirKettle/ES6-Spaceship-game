@@ -1,6 +1,6 @@
 # A canvas based game using React, RxJs
 
-Thanks to **badsyntax** for the excellent seed project - https://github.com/badsyntax/react-seed.git
+Thanks to [Richard Willis (aka badsyntax)](https://github.com/badsyntax/) for the excellent seed project - https://github.com/badsyntax/react-seed.git
 
 ### Installing with git
 
