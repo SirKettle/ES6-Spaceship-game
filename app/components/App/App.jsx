@@ -33,7 +33,7 @@ export default class App extends React.Component {
       score: 10
     },
     hero: {
-      speed: 20
+      speed: 200
     },
     data: {
       somethings: [ 1, 2, 3 ]
@@ -89,6 +89,8 @@ export default class App extends React.Component {
 
     console.log(defaultKeyActions);
 
+
+    const loopTime = 20;
     const { hero } = this.state;
     const { canvasConfig } = this.props;
 
@@ -96,40 +98,48 @@ export default class App extends React.Component {
     hero.y = 300;
     hero.shotCount = 0;
 
-    const moveHero ( hero, direction, delta ) => {
+    const moveHero = ( hero, direction, delta = loopTime ) => {
 
       const distance = hero.speed * delta / 1000;
+      let desiredPosition;
 
       switch (direction) {
         case 'left':
-          const desiredPosition = hero.x - distance;
-          hero.x = Math.max(0, desiredPosition);
+          desiredPosition = Math.max(0, hero.x - distance);
+          hero.x = desiredPosition;
+          break;
         case 'right':
-          const desiredPosition = hero.x + distance;
-          hero.x = Math.min(canvasConfig.width, desiredPosition);
+          desiredPosition = Math.min(canvasConfig.width, hero.x + distance);
+          hero.x = desiredPosition;
+          break;
         case 'up':
-          const desiredPosition = hero.y - distance;
-          hero.y = Math.max(0, desiredPosition);
+          desiredPosition = Math.max(0, hero.y - distance);
+          hero.y = desiredPosition;
+          break;
         case 'down':
-          const desiredPosition = hero.y + distance;
-          hero.y = Math.min(canvasConfig.width, desiredPosition);
+          desiredPosition = Math.min(canvasConfig.height, hero.y + distance);
+          hero.y = desiredPosition;
+          break;
       }
 
-      return hero;
+
+      this.setState({
+        hero: hero
+      });
     }
 
     const actions = {
       left: ( delta ) => {
-        hero = moveHero( hero, 'left', delta);
+        moveHero( hero, 'left', delta);
       },
       right: ( delta ) => {
-        hero = moveHero( hero, 'right', delta);
+        moveHero( hero, 'right', delta);
       },
       up: ( delta ) => {
-        hero = moveHero( hero, 'up', delta);
+        moveHero( hero, 'up', delta);
       },
       down: ( delta ) => {
-        hero = moveHero( hero, 'down', delta);
+        moveHero( hero, 'down', delta);
       },
       fire: ( delta ) => {
         // console.log('fire!');
@@ -162,42 +172,85 @@ export default class App extends React.Component {
 
     const { keysDown } = this.state || {};
 
-    const keyBoardSubscription = KeyboardService.streams.keyActions.subscribe( (event) => {
-      const keyCode = event.key || event.which;
-      const character = String.fromCharCode(keyCode);
-      const actionFunc = this.getActionByKeyCode( keyCode );
+    let lastStreamUpdate = Date.now();
 
-      if ( !actionFunc ) { return; }
+    // const keyBoardSubscription = KeyboardService.streams.keyActions.subscribe( (event) => {
+    //   const streamTime = Date.now();
+    //   const timeSinceLast = streamTime - lastStreamUpdate;
+    //   lastStreamUpdate = streamTime;
 
-      if ( event.type === 'keyup' ) {
-        delete keysDown[keyCode];
-      }
-      if ( event.type === 'keydown' ) {
-        keysDown[keyCode] = {
-          code: keyCode,
-          display: character,
-          action: actionFunc
-        };
-      }
+    //   console.log(timeSinceLast);
+    //   const keyCode = event.key || event.which;
+    //   const character = String.fromCharCode(keyCode);
+    //   const actionFunc = this.getActionByKeyCode( keyCode );
 
-      event.preventDefault();
+    //   if ( !actionFunc ) { return; }
 
-      this.setState({
-        keysDown: keysDown
-      });
-    });
+    //   if ( event.type === 'keyup' ) {
+    //     delete keysDown[keyCode];
+    //   }
+    //   if ( event.type === 'keydown' ) {
+    //     keysDown[keyCode] = {
+    //       code: keyCode,
+    //       display: character,
+    //       action: actionFunc
+    //     };
+    //   }
 
-    this.subscriptions.push(keyBoardSubscription);
+    //   event.preventDefault();
 
-    window.setInterval(this.gameLoop, 500);
+    //   this.setState({
+    //     keysDown: keysDown
+    //   });
+    // });
+
+    // const keyBoardSubscription = KeyboardService.streams.keyActions.subscribe( ( keysDown ) => {
+    //   const streamTime = Date.now();
+    //   const timeSinceLast = streamTime - lastStreamUpdate;
+    //   lastStreamUpdate = streamTime;
+
+    //   console.log(timeSinceLast, keysDown);
+    //   // const keyCode = event.key || event.which;
+    //   // const character = String.fromCharCode(keyCode);
+    //   // const actionFunc = this.getActionByKeyCode( keyCode );
+
+    //   // if ( !actionFunc ) { return; }
+
+    //   // if ( event.type === 'keyup' ) {
+    //   //   delete keysDown[keyCode];
+    //   // }
+    //   // if ( event.type === 'keydown' ) {
+    //   //   keysDown[keyCode] = {
+    //   //     code: keyCode,
+    //   //     display: character,
+    //   //     action: actionFunc
+    //   //   };
+    //   // }
+
+    //   // event.preventDefault();
+
+    //   // this.setState({
+    //   //   keysDown: keysDown
+    //   // });
+    // });
+
+    // debugger;
+
+    KeyboardService.Controller(this.keyCodeActionMap, loopTime);
+
+    // this.subscriptions.push(keyBoardSubscription);
+
+    // window.setInterval(this.gameLoop, 10);
   }
 
   getActionByKeyCode = ( keyCode ) => {
     return this.keyCodeActionMap[ objectUtils.getSafeKey( keyCode ) ];
+    // return this.keyCodeActionMap[ keyCode.toString() ];
   }
 
   setActionByKeyCode = ( keyCode, actionFunc ) => {
     this.keyCodeActionMap[ objectUtils.getSafeKey( keyCode ) ] = actionFunc;
+    // this.keyCodeActionMap[ keyCode.toString() ] = actionFunc;
   }
 
   componentWillUnmount() {
@@ -224,8 +277,6 @@ export default class App extends React.Component {
       console.log(event);
     };
 
-        // <Body items={this.state.items} />
-        // <Footer />
     return (
       <div className={styles.app}>
         <Game
