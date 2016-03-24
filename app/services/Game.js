@@ -1,47 +1,78 @@
 
+import objectUtils from '../util/object';
 
+class GameClock {
 
-class Game {
-	constructor () {
-    window.setInterval( () => {
-      this.callActions();
-    }, this.delta );
-	}
+    constructor ( delta = 20 ) {
+        this.delta = delta;
+        this.isRunning = false;
+        this.actions = {};
+        this.actionCount = 0;
+        this.intervalId = null;
+    };
 
-  loopActions = {
+    static getKey( sdf ) {
+        // Canvas drawing code
+    };
 
-  }
+    // public functions
+    run () {
+      Object.keys(this.actions).forEach( ( actionKey ) => {
+        const action = this.actions[ actionKey ];
+        action( this.delta );
+      } );
+    }
 
-  delta = 20;
+    toggle () {
+      this[ this.isRunning ? 'pause' : 'start' ]();
+    }
 
-  callActions () {
-    Object.keys(this.loopActions).forEach( ( actionKey ) => {
-      const action = this.loopActions[ actionKey ];
-      action();
-    } );
-  }
+    start () {
+      this.intervalId = window.setInterval( () => {
+        this.run();
+      }, this.delta );
+      this.isRunning = true;
+    }
 
-  addToLoop = ( action ) => {
-    const actionKey = getUID();
-    this.loopActions[actionKey] = action;
-    return actionKey;
-  }
+    pause () {
+      window.clearInterval(this.intervalId);
+      this.isRunning = false;
+    }
 
-  removeLoopAction = ( actionKey ) => {
-    delete this.loopActions[actionKey];
-  }
+    stop () {
+      this.pause();
+      this.resetActions();
+    }
+
+    addAction ( action ) {
+      if ( !this.isRunning ) { return; }
+      this.actionCount++;
+      const actionKey = objectUtils.getSafeKey( this.actionCount );
+      this.actions[ actionKey ] = action;
+      return actionKey;
+    }
+
+    removeAction ( actionKey ) {
+      delete this.actions[ actionKey ];
+    }
+
+    resetActions () {
+      this.actions = {};
+    }
+
+    set delta ( dt ) {
+      this._delta = dt;
+    }
+
+    get delta () {
+      return this._delta;
+    }
 }
 
-const GameService = () => {
-  initGame: () => {
-    return new Game();
-  }
-};
+ const Game = {
+ 	Clock: ( delta ) => {
+ 		return new GameClock( delta );
+ 	}
+ };
 
-
-
-
-
-
-
-export default GameService;
+ export default Game;

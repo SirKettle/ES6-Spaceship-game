@@ -6,10 +6,10 @@ import AppActions from '../../actions/AppActions';
 import ItemsStore from '../../stores/ItemsStore';
 import Body from '../Body/Body';
 import Footer from '../Footer/Footer';
-import Game from '../Game/Game';
-import Keyboard from '../../services/Keyboard';
-import GameService from '../../services/Game';
 import Hero from '../../class/Hero';
+import GameComponent from '../Game/Game';
+import KeyboardService from '../../services/Keyboard';
+import Game from '../../services/Game';
 import defaultKeyActions from '../../data/defaultKeyActions.json';
 import gameUtils from '../../util/game';
 import objectUtils from '../../util/object';
@@ -54,22 +54,6 @@ export default class App extends React.Component {
       });
   }
 
-  loopTime = Date.now();
-
-  gameLoop = () => {
-
-    const lastLoopTime = this.loopTime;
-    this.loopTime = Date.now();
-
-    const delta = this.loopTime - lastLoopTime;
-
-    Object.keys(this.state.keysDown)
-      .forEach( (keyCode) => {
-        const { action } = this.state.keysDown[ keyCode ];
-        action(delta);
-      });
-  }
-
   renderConsoleOutput = () => {
     // TODO: This needs to iterate through an array/object to output anything
     // needed in the console
@@ -83,10 +67,7 @@ export default class App extends React.Component {
 
   componentDidMount() {
 
-    console.log(defaultKeyActions);
-
-
-    const loopTime = 20;
+    this.gameClock = Game.Clock(20);
     const { canvasConfig } = this.props;
 
     const initialHeroSettings = {
@@ -102,25 +83,26 @@ export default class App extends React.Component {
     );
 
     const actions = {
-      left: ( delta = loopTime ) => {
+      left: ( delta ) => {
         hero.turnLeft( delta );
       },
-      right: ( delta = loopTime ) => {
+      right: ( delta ) => {
         hero.turnRight( delta );
       },
-      up: ( delta = loopTime ) => {
+      up: ( delta ) => {
         hero.accelerate( delta );
       },
-      down: ( delta = loopTime ) => {
+      down: ( delta ) => {
         hero.decelerate( delta );
       },
-      fire: ( delta = loopTime ) => {
+      fire: ( delta ) => {
         // console.log('fire!');
         hero.shotCount++;
         console.log('hero.shotCount', hero.shotCount);
       },
       pause: () => {
-        console.log('pause');
+        console.log('pause toggle');
+        this.gameClock.toggle();
       },
       roll: () => {
         console.log('roll - ' + gameUtils.rollDice());
@@ -141,16 +123,16 @@ export default class App extends React.Component {
 
     const { keysDown } = this.state || {};
 
-    let lastStreamUpdate = Date.now();
 
-    Keyboard.Controller(this.keyCodeActionMap, loopTime);
-
-    setInterval(() => {
-      hero.update(loopTime);
+    this.gameClock.start();
+    KeyboardService.Controller(this.gameClock, this.keyCodeActionMap);
+    this.gameClock.addAction( ( delta ) => {
+      // render scene here...
+      hero.update( delta );
       this.setState({
         hero: hero.state
       });
-    }, loopTime);
+    } );
   }
 
   getActionByKeyCode = ( keyCode ) => {
@@ -176,7 +158,7 @@ export default class App extends React.Component {
 
     return (
       <div className={styles.app}>
-        <Game
+        <GameComponent
           hero={ this.state.hero }
           gameState={ this.state }
           canvas={ this.props.canvasConfig }

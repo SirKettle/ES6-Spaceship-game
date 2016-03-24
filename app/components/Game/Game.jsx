@@ -2,7 +2,7 @@ import styles from './_Game.scss';
 import React from 'react';
 import canvasUtils from '../../util/canvas';
 
-export default class Game extends React.Component {
+export default class GameComponent extends React.Component {
 
   static propTypes = {
     hero: React.PropTypes.object,

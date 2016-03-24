@@ -54,11 +54,10 @@ const allKeysDownStream = Rx.Observable.create( ( observer ) => {
   };
 });
 
-
-const KeyboardController = ( keyActions, repeat = 0 ) => {
+const KeyboardControl = ( GameClock, keyActions) => {
     // Lookup of key codes to timer ID, or null for no repeat
     //
-    const timers = {};
+    const actionIds = {};
 
     // When key is pressed and we don't already think it's pressed, call the
     // key action callback and set a timer to generate another one after a delay
@@ -71,12 +70,8 @@ const KeyboardController = ( keyActions, repeat = 0 ) => {
           return;
         }
 
-        if ( !timers[key] ) {
-          timers[key] = null;
-          keyAction();
-          if ( repeat !== 0 ) {
-            timers[key] = window.setInterval( keyAction, repeat );
-          }
+        if ( !actionIds[key] ) {
+          actionIds[key] = GameClock.addAction(keyAction);
         }
     };
 
@@ -84,11 +79,9 @@ const KeyboardController = ( keyActions, repeat = 0 ) => {
     //
     document.onkeyup = ( event ) => {
         const key = objectUtils.getSafeKey( event.key || event.which );
-        if ( timers[key] ) {
-          if ( timers[key] !== null ) {
-            window.clearInterval( timers[key] );
-          }
-          delete timers[key];
+        if ( actionIds[key] ) {
+          GameClock.removeAction( actionIds[key] );
+          delete actionIds[key];
         }
     };
 
@@ -97,10 +90,11 @@ const KeyboardController = ( keyActions, repeat = 0 ) => {
     //
     window.onblur = ( event ) => {
 
-      Object.keys( timers ).forEach( (key) => {
-        if ( timers[key] !== null ) {
-          window.clearInterval( timers[key] );
+      Object.keys( actionIds ).forEach( (key) => {
+        if ( actionIds[key] !== null ) {
+          GameClock.removeAction( actionIds[key] );
         }
+        delete actionIds[key];
       });
     };
 };
@@ -110,7 +104,7 @@ const Keyboard = {
     keyActions: keyActionsStream,
     allKeysDown: allKeysDownStream
   },
-  Controller: KeyboardController
+  Controller: KeyboardControl
 }
 
 export default Keyboard;
