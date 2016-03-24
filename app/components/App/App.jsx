@@ -7,7 +7,9 @@ import ItemsStore from '../../stores/ItemsStore';
 import Body from '../Body/Body';
 import Footer from '../Footer/Footer';
 import Game from '../Game/Game';
-import KeyboardService from '../../services/Keyboard';
+import Keyboard from '../../services/Keyboard';
+import GameService from '../../services/Game';
+import Example from '../../class/Example';
 import defaultKeyActions from '../../data/defaultKeyActions.json';
 import gameUtils from '../../util/game';
 import objectUtils from '../../util/object';
@@ -17,6 +19,13 @@ function getAppState() {
     items: ItemsStore.getAll()
   };
 }
+
+
+const rad = 2;
+const myExample = new Example( rad );
+debugger;
+
+const GameInstance = GameService.initGame();
 
 export default class App extends React.Component {
 
@@ -174,90 +183,15 @@ export default class App extends React.Component {
 
     let lastStreamUpdate = Date.now();
 
-    // const keyBoardSubscription = KeyboardService.streams.keyActions.subscribe( (event) => {
-    //   const streamTime = Date.now();
-    //   const timeSinceLast = streamTime - lastStreamUpdate;
-    //   lastStreamUpdate = streamTime;
-
-    //   console.log(timeSinceLast);
-    //   const keyCode = event.key || event.which;
-    //   const character = String.fromCharCode(keyCode);
-    //   const actionFunc = this.getActionByKeyCode( keyCode );
-
-    //   if ( !actionFunc ) { return; }
-
-    //   if ( event.type === 'keyup' ) {
-    //     delete keysDown[keyCode];
-    //   }
-    //   if ( event.type === 'keydown' ) {
-    //     keysDown[keyCode] = {
-    //       code: keyCode,
-    //       display: character,
-    //       action: actionFunc
-    //     };
-    //   }
-
-    //   event.preventDefault();
-
-    //   this.setState({
-    //     keysDown: keysDown
-    //   });
-    // });
-
-    // const keyBoardSubscription = KeyboardService.streams.keyActions.subscribe( ( keysDown ) => {
-    //   const streamTime = Date.now();
-    //   const timeSinceLast = streamTime - lastStreamUpdate;
-    //   lastStreamUpdate = streamTime;
-
-    //   console.log(timeSinceLast, keysDown);
-    //   // const keyCode = event.key || event.which;
-    //   // const character = String.fromCharCode(keyCode);
-    //   // const actionFunc = this.getActionByKeyCode( keyCode );
-
-    //   // if ( !actionFunc ) { return; }
-
-    //   // if ( event.type === 'keyup' ) {
-    //   //   delete keysDown[keyCode];
-    //   // }
-    //   // if ( event.type === 'keydown' ) {
-    //   //   keysDown[keyCode] = {
-    //   //     code: keyCode,
-    //   //     display: character,
-    //   //     action: actionFunc
-    //   //   };
-    //   // }
-
-    //   // event.preventDefault();
-
-    //   // this.setState({
-    //   //   keysDown: keysDown
-    //   // });
-    // });
-
-    // debugger;
-
-    KeyboardService.Controller(this.keyCodeActionMap, loopTime);
-
-    // this.subscriptions.push(keyBoardSubscription);
-
-    // window.setInterval(this.gameLoop, 10);
+    Keyboard.Controller(this.keyCodeActionMap, loopTime);
   }
 
   getActionByKeyCode = ( keyCode ) => {
     return this.keyCodeActionMap[ objectUtils.getSafeKey( keyCode ) ];
-    // return this.keyCodeActionMap[ keyCode.toString() ];
   }
 
   setActionByKeyCode = ( keyCode, actionFunc ) => {
     this.keyCodeActionMap[ objectUtils.getSafeKey( keyCode ) ] = actionFunc;
-    // this.keyCodeActionMap[ keyCode.toString() ] = actionFunc;
-  }
-
-  componentWillUnmount() {
-    ItemsStore.removeChangeListener(this.onChange);
-  }
-
-  componentWillMount() {
   }
 
   componentWillUnmount() {
@@ -265,10 +199,6 @@ export default class App extends React.Component {
     this.subscriptions.forEach( ( subscription) => {
       subscription.dispose();
     });
-  }
-
-  onChange = () => {
-    this.setState(getAppState());
   }
 
   render() {

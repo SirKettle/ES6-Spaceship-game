@@ -20,12 +20,12 @@ export default class Game extends React.Component {
 
   renderScene( ctx, canvas ) {
     const { gameState } = this.props;
-    ctx.fillStyle = '#fafafa';
+    ctx.fillStyle = '#fefefe';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     // console.log(gameState);
 
-    canvasUtils.drawTriangle( ctx, gameState.hero.x, gameState.hero.y, 20, '#dddddd', 'up' );
+    canvasUtils.drawTriangle( ctx, gameState.hero.x, gameState.hero.y, 20, '#fafafa', 'up' );
 
     this.paintScore( ctx );
   }

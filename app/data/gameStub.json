@@ -1,0 +1,64 @@
+{
+    paused: false,
+    gameOver: false,
+    score: {
+        level: 1,
+        total: 1200
+    },
+    stats: {
+        kills: 45,
+        coins: 32,
+        levelTimes: [
+            234328
+        ],
+        difficultyLevel: 2
+    },
+    debug: {
+        FPS: 45,
+        canvasWidth: 960,
+        canvasHeight: 600 
+    },
+    hero: {
+        direction: 180,
+        position: {
+            x: 230,
+            y: 278
+        },
+        collision: false, // collision may be replaced with animation/image?
+        health: 1,
+        animation: << index or png >> // ie: 'hero/180/fast/2.png'
+    },
+    enemies: [
+        {
+            direction: 340,
+            position: {
+                x: 120,
+                y: 28
+            },
+            collision: false, // collision may be replaced with animation/image?
+            health: 1,
+            animation: << index or png >> // ie: 'hero/180/fast/2.png'
+        }
+    ],
+    shots: [
+        {
+            direction: 90,
+            position: {
+                x: 170,
+                y: 248
+            },
+            power: 1,
+            collision: true,
+            animation: << index or png >>
+        },
+        {
+            direction: 113,
+            position: {
+                x: 20,
+                y: 43
+            },
+            power: 0.25, // maybe an enemy shot is less powerful???
+            collision: false
+        }
+    ]
+}

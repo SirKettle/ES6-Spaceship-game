@@ -25,7 +25,7 @@ const keyActionsStream = Rx.Observable
   });
 
 const allKeysDownStream = Rx.Observable.create( ( observer ) => {
-  
+
   const allKeysDown = {};
 
   const onKeyDown = ( event ) => {
@@ -105,7 +105,7 @@ const KeyboardController = ( keyActions, repeat = 0 ) => {
     };
 };
 
-const KeyboardService = {
+const Keyboard = {
   streams: {
     keyActions: keyActionsStream,
     allKeysDown: allKeysDownStream
@@ -113,4 +113,4 @@ const KeyboardService = {
   Controller: KeyboardController
 }
 
-export default KeyboardService;
+export default Keyboard;
