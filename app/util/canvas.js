@@ -23,6 +23,7 @@ const canvasUtils = {
     // ctx.lineTo(x + width, y + width);
 
 
+    const radians = gameUtils.degreesToRadians( direction );
     const distanceX = Math.sin( radians ) * width;
     const distanceY = Math.cos( radians ) * width;
   }
