@@ -5,6 +5,7 @@ import canvasUtils from '../../util/canvas';
 export default class Game extends React.Component {
 
   static propTypes = {
+    hero: React.PropTypes.object,
     gameState: React.PropTypes.shape({
       running: React.PropTypes.bool,
       score: React.PropTypes.object,
@@ -19,23 +20,23 @@ export default class Game extends React.Component {
   }
 
   renderScene( ctx, canvas ) {
-    const { gameState } = this.props;
+    const { hero } = this.props;
     ctx.fillStyle = '#fefefe';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     // console.log(gameState);
 
-    canvasUtils.drawTriangle( ctx, gameState.hero.x, gameState.hero.y, 20, '#fafafa', 'up' );
+    canvasUtils.drawTriangle( ctx, hero.x, hero.y, 20, '#f2f2f2', hero.direction );
 
     this.paintScore( ctx );
   }
 
   paintScore ( ctx ) {
-    const { gameState } = this.props;
+    const { gameState, hero } = this.props;
     const score = gameState.score.score;
     ctx.fillStyle = '#cccccc';
     ctx.font = 'bold 26px sans-serif';
-    ctx.fillText('s: ' + score, 40, 43);
+    ctx.fillText('s: ' + hero.direction, 40, 43);
   }
 
   componentDidMount() {

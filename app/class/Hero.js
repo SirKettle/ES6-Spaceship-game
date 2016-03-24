@@ -1,45 +1,5 @@
 
-const degreesToRadians = ( degrees ) => {
-  return degrees * ( Math.PI / 180 );
-};
-
-const radiansToDegrees = ( radians ) => {
-  return radians * ( 180 / Math.PI );
-};
-
-class Example {
-
-  constructor ( radius ) {
-      this.radius = radius;
-      Example.examplesMade++;
-  };
-
-  static draw (circle, canvas) {
-      // Canvas drawing code
-  }
-
-  static get circlesMade() {
-      return !this._count ? 0 : this._count;
-  }
-
-  static set circlesMade(val) {
-      this._count = val;
-  }
-
-  area() {
-      return Math.pow(this.radius, 2) * Math.PI;
-  }
-
-  get radius () {
-      return this._radius;
-  }
-
-  set radius (radius) {
-      if (!Number.isInteger(radius))
-          throw new Error("Circle radius must be an integer.");
-      this._radius = radius;
-  }
-}
+import gameUtils from '../util/game';
 
 class Hero {
 
@@ -49,7 +9,7 @@ class Hero {
       speed: 0, // px/s
       acceleration: 20, // px/s
       maxSpeed: 200, // px/s
-      turnSpeed: 180, // deg/s
+      turnSpeed: 90, // deg/s
       x: x,
       y: y,
       health: health
@@ -68,7 +28,7 @@ class Hero {
 
   accelerate ( delta, faster = true ) {
     const prevSpeed = this._state.speed;
-    const accelerateBy = acceleration / delta;
+    const accelerateBy = this._state.acceleration / delta;
     let newSpeed;
 
     if ( faster ) {
@@ -113,7 +73,7 @@ class Hero {
   update ( delta, collision = false ) {
     // calc distance to travel
     const distance = this._state.speed * delta / 1000;
-    const radians = degreesToRadians( this._state.direction );
+    const radians = gameUtils.degreesToRadians( this._state.direction );
     const distanceX = Math.sin( radians ) * distance;
     const distanceY = Math.cos( radians ) * distance;
 
@@ -131,4 +91,4 @@ class Hero {
 
 }
 
-export default Example;
+export default Hero;

@@ -9,23 +9,12 @@ import Footer from '../Footer/Footer';
 import Game from '../Game/Game';
 import Keyboard from '../../services/Keyboard';
 import GameService from '../../services/Game';
-import Example from '../../class/Example';
+import Hero from '../../class/Hero';
 import defaultKeyActions from '../../data/defaultKeyActions.json';
 import gameUtils from '../../util/game';
 import objectUtils from '../../util/object';
 
-function getAppState() {
-  return {
-    items: ItemsStore.getAll()
-  };
-}
-
-
-const rad = 2;
-const myExample = new Example( rad );
-debugger;
-
-const GameInstance = GameService.initGame();
+// const GameInstance = GameService.initGame();
 
 export default class App extends React.Component {
 
@@ -93,64 +82,39 @@ export default class App extends React.Component {
   }
 
   componentDidMount() {
-    ItemsStore.addChangeListener(this.onChange);
-    AppActions.getItems();
 
     console.log(defaultKeyActions);
 
 
     const loopTime = 20;
-    const { hero } = this.state;
     const { canvasConfig } = this.props;
 
-    hero.x = 300;
-    hero.y = 300;
-    hero.shotCount = 0;
-
-    const moveHero = ( hero, direction, delta = loopTime ) => {
-
-      const distance = hero.speed * delta / 1000;
-      let desiredPosition;
-
-      switch (direction) {
-        case 'left':
-          desiredPosition = Math.max(0, hero.x - distance);
-          hero.x = desiredPosition;
-          break;
-        case 'right':
-          desiredPosition = Math.min(canvasConfig.width, hero.x + distance);
-          hero.x = desiredPosition;
-          break;
-        case 'up':
-          desiredPosition = Math.max(0, hero.y - distance);
-          hero.y = desiredPosition;
-          break;
-        case 'down':
-          desiredPosition = Math.min(canvasConfig.height, hero.y + distance);
-          hero.y = desiredPosition;
-          break;
-      }
-
-
-      this.setState({
-        hero: hero
-      });
+    const initialHeroSettings = {
+      direction: 0,
+      x: canvasConfig.width / 2,
+      y: canvasConfig.height / 2
     }
 
+    const hero = new Hero(
+      initialHeroSettings.direction,
+      initialHeroSettings.x,
+      initialHeroSettings.y
+    );
+
     const actions = {
-      left: ( delta ) => {
-        moveHero( hero, 'left', delta);
+      left: ( delta = loopTime ) => {
+        hero.turnLeft( delta );
       },
-      right: ( delta ) => {
-        moveHero( hero, 'right', delta);
+      right: ( delta = loopTime ) => {
+        hero.turnRight( delta );
       },
-      up: ( delta ) => {
-        moveHero( hero, 'up', delta);
+      up: ( delta = loopTime ) => {
+        hero.accelerate( delta );
       },
-      down: ( delta ) => {
-        moveHero( hero, 'down', delta);
+      down: ( delta = loopTime ) => {
+        hero.decelerate( delta );
       },
-      fire: ( delta ) => {
+      fire: ( delta = loopTime ) => {
         // console.log('fire!');
         hero.shotCount++;
         console.log('hero.shotCount', hero.shotCount);
@@ -162,10 +126,6 @@ export default class App extends React.Component {
         console.log('roll - ' + gameUtils.rollDice());
       }
     };
-
-    this.setState({
-      hero: hero
-    });
 
 
     const getSafeKey = ( num ) => `key_${num}`;
@@ -184,6 +144,13 @@ export default class App extends React.Component {
     let lastStreamUpdate = Date.now();
 
     Keyboard.Controller(this.keyCodeActionMap, loopTime);
+
+    setInterval(() => {
+      hero.update(loopTime);
+      this.setState({
+        hero: hero.state
+      });
+    }, loopTime);
   }
 
   getActionByKeyCode = ( keyCode ) => {
@@ -210,6 +177,7 @@ export default class App extends React.Component {
     return (
       <div className={styles.app}>
         <Game
+          hero={ this.state.hero }
           gameState={ this.state }
           canvas={ this.props.canvasConfig }
           onCanvasClicked={ onCanvasClicked }
