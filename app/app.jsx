@@ -8,8 +8,8 @@ import React from 'react';
 import App from './components/App/App';
 
 const canvasConfig = {
-  width: 600,
-  height: 400
+  width: 1000,
+  height: 600
 };
 
 React.render(

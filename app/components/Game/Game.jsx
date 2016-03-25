@@ -21,12 +21,13 @@ export default class GameComponent extends React.Component {
 
   renderScene( ctx, canvas ) {
     const { hero } = this.props;
-    ctx.fillStyle = '#fefefe';
+    ctx.fillStyle = '#44ddff';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     // console.log(gameState);
 
-    canvasUtils.drawTriangle( ctx, hero.x, hero.y, 20, '#f2f2f2', hero.direction );
+    // canvasUtils.drawTriangle( ctx, hero.x, hero.y, 20, '#f2f2f2', hero.direction );
+    canvasUtils.drawShip( canvas, ctx, hero.x, hero.y, hero.direction );
 
     this.paintScore( ctx );
   }
@@ -36,7 +37,7 @@ export default class GameComponent extends React.Component {
     const score = gameState.score.score;
     ctx.fillStyle = '#cccccc';
     ctx.font = 'bold 26px sans-serif';
-    ctx.fillText('s: ' + hero.direction, 40, 43);
+    ctx.fillText('s: ' + hero.speed, 40, 43);
   }
 
   componentDidMount() {

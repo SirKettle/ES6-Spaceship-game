@@ -7,9 +7,10 @@ class Hero {
     this._state = {
       direction: direction,
       speed: 0, // px/s
-      acceleration: 20, // px/s
-      maxSpeed: 200, // px/s
-      turnSpeed: 90, // deg/s
+      acceleration: 100, // px/s
+      breaking: 200, // px/s
+      maxSpeed: 400, // px/s
+      turnSpeed: 100, // deg/s
       x: x,
       y: y,
       health: health
@@ -29,13 +30,14 @@ class Hero {
   accelerate ( delta, faster = true ) {
     const prevSpeed = this._state.speed;
     const accelerateBy = this._state.acceleration / delta;
+    const breakBy = this._state.breaking / delta;
     let newSpeed;
 
     if ( faster ) {
       newSpeed = Math.min( this._state.maxSpeed, prevSpeed + accelerateBy );
     }
     else {
-      newSpeed = Math.max( 0, prevSpeed - accelerateBy );
+      newSpeed = Math.max( 0, prevSpeed - breakBy );
     }
     // set new speed
     this._state.speed = newSpeed;
