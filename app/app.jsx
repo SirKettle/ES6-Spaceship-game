@@ -7,12 +7,16 @@ import './scss/app.scss';
 import React from 'react';
 import App from './components/App/App';
 
-const canvasConfig = {
-  width: 1000,
-  height: 600
-};
+document.addEventListener( 'DOMContentLoaded', ( event ) => {
+	setTimeout( () => {
+		const canvasConfig = {
+		  width: document.body.clientWidth,
+		  height: document.body.clientHeight
+		};
+		React.render(
+		  <App canvasConfig={ canvasConfig } />,
+		  document.getElementById('app')
+		);
+	});
+});
 
-React.render(
-  <App canvasConfig={ canvasConfig } />,
-  document.getElementById('app')
-);

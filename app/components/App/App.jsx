@@ -27,32 +27,18 @@ export default class App extends React.Component {
 
   state = {
     running: true,
+    hero: {},
+    enemies: [],
+    shots: [],
     score: {
       score: 10
     },
-    hero: {
-      speed: 200
-    },
     data: {
       somethings: [ 1, 2, 3 ]
-    },
-    keysDown: {}
+    }
   }
 
   subscriptions = [];
-  keyCodeActionMap = {};
-
-  renderKeysDown = () => {
-    return Object.keys(this.state.keysDown)
-      .map( (keyCode) => {
-        const { display, action } = this.state.keysDown[ keyCode ];
-
-        // action();
-        return (
-          <span key={ keyCode }>{ display }</span>
-        );
-      });
-  }
 
   renderConsoleOutput = () => {
     // TODO: This needs to iterate through an array/object to output anything
@@ -60,7 +46,6 @@ export default class App extends React.Component {
     return (
       <div>
         <h3>Console</h3>
-        <p>Keys down: <strong>{ this.renderKeysDown() }</strong></p>
       </div>
     );
   }
@@ -77,10 +62,100 @@ export default class App extends React.Component {
     }
 
     const hero = new Hero(
+      canvasConfig,
       initialHeroSettings.direction,
       initialHeroSettings.x,
       initialHeroSettings.y
     );
+
+
+    const enemy1 = new Hero(
+      canvasConfig,
+      45,
+      100,
+      100
+    );
+    
+    let allThings = [];
+
+    allThings.push( enemy1 );
+
+    this.gameClock.start();
+    // add actions to keyboard events
+    KeyboardService.Controller( this.gameClock, this.getKeyboardActions( hero ) );
+    this.gameClock.addAction( ( delta ) => {
+      // render scene here...
+      hero.update( delta );
+
+      let allShots = hero.state.shots; // .concat(blah.shots..)
+
+      allShots.forEach( ( shot ) => {
+        shot.update( delta );
+      });
+
+      allThings.forEach( ( thing ) => {
+        thing.update( delta );
+      });
+
+      //coliision
+
+
+      allThings.forEach( ( thing ) => {
+        this.handleCollision( thing, hero );
+      });
+
+
+      allShots.forEach( ( shot ) => {
+        // this.handleCollision( shot, hero );
+
+        allThings.forEach( ( thing ) => {
+          this.handleCollision( thing, shot );
+        });
+
+      });
+
+      // need to paint collisions
+
+      allThings = allThings.filter( ( thing ) => {
+        return thing.alive;
+      });
+
+
+
+      this.setState({
+        hero: hero.state
+      });
+
+      this.setState({
+        enemies: allThings.map( ( thing ) => thing.state )
+      });
+
+      this.setState({
+        shots: allShots.map( ( shot ) => shot.state )
+      });
+      
+    });
+  }
+
+  handleCollision = ( thing1, thing2 ) => {
+    const isCollision = this.getIsCollision( thing1.getCircle(), thing2.getCircle() );
+
+    if ( isCollision ) {
+      thing1.hit( thing2 );
+      thing2.hit( thing1 );
+    }
+  }
+
+  getIsCollision = ( circle1, circle2 ) => {
+    const dx = Math.abs( circle1.x - circle2.x );
+    const dy = Math.abs( circle1.y - circle2.y );
+    const distance = Math.sqrt( dx * dx + dy * dy );
+    return Boolean( distance < ( circle1.radius + circle2.radius ) );
+  }
+
+  getKeyboardActions ( hero ) {
+
+    const keyCodeActionMap = {};
 
     const actions = {
       left: ( delta ) => {
@@ -96,9 +171,10 @@ export default class App extends React.Component {
         hero.decelerate( delta );
       },
       fire: ( delta ) => {
-        // console.log('fire!');
-        hero.shotCount++;
-        console.log('hero.shotCount', hero.shotCount);
+        console.log('fire!');
+        hero.shoot();
+        // hero.shotCount++;
+        // console.log('hero.shotCount', hero.shotCount);
       },
       pause: () => {
         console.log('pause toggle');
@@ -109,38 +185,14 @@ export default class App extends React.Component {
       }
     };
 
-
-    const getSafeKey = ( num ) => `key_${num}`;
-
     Object.keys( defaultKeyActions ).forEach( ( key ) => {
-      const codes = defaultKeyActions[key];
-      codes.forEach( ( code ) => {
-        this.setActionByKeyCode( code, actions[key] );
+      const keyCodes = defaultKeyActions[key];
+      keyCodes.forEach( ( keyCode ) => {
+        keyCodeActionMap[ objectUtils.getSafeKey( keyCode ) ] = actions[key];
       });
     });
 
-    console.log(this.keyCodeActionMap);
-
-    const { keysDown } = this.state || {};
-
-
-    this.gameClock.start();
-    KeyboardService.Controller(this.gameClock, this.keyCodeActionMap);
-    this.gameClock.addAction( ( delta ) => {
-      // render scene here...
-      hero.update( delta );
-      this.setState({
-        hero: hero.state
-      });
-    } );
-  }
-
-  getActionByKeyCode = ( keyCode ) => {
-    return this.keyCodeActionMap[ objectUtils.getSafeKey( keyCode ) ];
-  }
-
-  setActionByKeyCode = ( keyCode, actionFunc ) => {
-    this.keyCodeActionMap[ objectUtils.getSafeKey( keyCode ) ] = actionFunc;
+    return keyCodeActionMap;
   }
 
   componentWillUnmount() {
@@ -160,13 +212,12 @@ export default class App extends React.Component {
       <div className={styles.app}>
         <GameComponent
           hero={ this.state.hero }
+          enemies={ this.state.enemies }
+          shots={ this.state.shots }
           gameState={ this.state }
           canvas={ this.props.canvasConfig }
           onCanvasClicked={ onCanvasClicked }
         />
-        <div class={ styles.console }>
-          { this.renderConsoleOutput() }
-        </div>
       </div>
     );
   }
