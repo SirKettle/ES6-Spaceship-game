@@ -9,6 +9,7 @@ class GameClock {
         this.actions = {};
         this.actionCount = 0;
         this.intervalId = null;
+        this.lastTimeRun = Date.now();
     };
 
     static getKey( sdf ) {
@@ -17,10 +18,18 @@ class GameClock {
 
     // public functions
     run () {
+      const newTime = Date.now();
+      this.delta = newTime - this.lastTimeRun;
+      this.lastTimeRun = newTime;
       Object.keys(this.actions).forEach( ( actionKey ) => {
         const action = this.actions[ actionKey ];
         action( this.delta );
       } );
+      if (this.isRunning) {
+        window.requestAnimationFrame( () => {
+          this.run();
+        });
+      }
     }
 
     toggle () {
@@ -28,14 +37,14 @@ class GameClock {
     }
 
     start () {
-      this.intervalId = window.setInterval( () => {
-        this.run();
-      }, this.delta );
+      // this.intervalId = window.setInterval( () => {
+      // }, this.delta );
       this.isRunning = true;
+      this.run();
     }
 
     pause () {
-      window.clearInterval(this.intervalId);
+      // window.clearInterval(this.intervalId);
       this.isRunning = false;
     }
 

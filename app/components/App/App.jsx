@@ -14,6 +14,25 @@ import defaultKeyActions from '../../data/defaultKeyActions.json';
 import gameUtils from '../../util/game';
 import objectUtils from '../../util/object';
 
+require("file?!../../assets/will_ship_sp0.png");
+require("file?!../../assets/will_ship_sp1.png");
+require("file?!../../assets/will_ship_sp2.png");
+require("file?!../../assets/will_ship_sp3.png");
+require("file?!../../assets/will_ship_sp4.png");
+require("file?!../../assets/will_ship_sp5.png");
+
+const daddyShipImages = [];
+daddyShipImages.push(document.createElement('img'));
+daddyShipImages.push(document.createElement('img'));
+daddyShipImages.push(document.createElement('img'));
+daddyShipImages.push(document.createElement('img'));
+daddyShipImages.push(document.createElement('img'));
+daddyShipImages.push(document.createElement('img'));
+
+daddyShipImages.forEach( ( ds, index ) => {
+    ds.src = `/assets/will_ship_sp${ index }.png`;
+});
+
 // const GameInstance = GameService.initGame();
 
 export default class App extends React.Component {
@@ -56,25 +75,31 @@ export default class App extends React.Component {
     const { canvasConfig } = this.props;
 
     const initialHeroSettings = {
+      _ready: true,
+      type: 'hero',
+      name: 'Daddy Ship Class I',
+      health: 1,
+      power: 1,
+      size: 180,
+      speed: 0,
+      acceleration: 300,
+      breaking: 450,
+      maxSpeed: 1000,
+      turnSpeed: 90,
+      x: canvasConfig.width * 0.5,
+      y: canvasConfig.height * 0.5,
       direction: 0,
-      x: canvasConfig.width / 2,
-      y: canvasConfig.height / 2
-    }
+      images: daddyShipImages,
+      shotHealth: 2,
+      shotPower: 0.2,
+      shotSpeed: 900,
+      shotLifeSpan: 200
+    };
 
-    const hero = new Hero(
-      canvasConfig,
-      initialHeroSettings.direction,
-      initialHeroSettings.x,
-      initialHeroSettings.y
-    );
+    const hero = new Hero( canvasConfig, initialHeroSettings );
 
 
-    const enemy1 = new Hero(
-      canvasConfig,
-      45,
-      100,
-      100
-    );
+    const enemy1 = new Hero( canvasConfig, { direction: 135 } );
     
     let allThings = [];
 
@@ -138,7 +163,7 @@ export default class App extends React.Component {
   }
 
   handleCollision = ( thing1, thing2 ) => {
-    const isCollision = this.getIsCollision( thing1.getCircle(), thing2.getCircle() );
+    const isCollision = this.getIsCollision( thing1.circle, thing2.circle );
 
     if ( isCollision ) {
       thing1.hit( thing2 );
@@ -181,7 +206,7 @@ export default class App extends React.Component {
         this.gameClock.toggle();
       },
       roll: () => {
-        console.log('roll - ' + gameUtils.rollDice());
+        // console.log('roll - ' + gameUtils.rollDice());
       }
     };
 

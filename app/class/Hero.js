@@ -3,11 +3,12 @@ import gameUtils from '../util/game';
 
 class Shot {
 
-  constructor ( direction, x, y, speed = 1000, power = 0.3, health = 0.1, size = 6, color = '#ffff00' ) {
+  constructor ( direction, x, y, speed = 1000, power = 1, health = 1, lifeSpan = 300, size = 6, color = '#ffff00' ) {
     this._state = {
       direction: direction,
       speed: speed,
       power: power,
+      lifeSpan: lifeSpan, // ms
       health: health,
       size: size,
       color: color,
@@ -35,15 +36,6 @@ class Shot {
     this._state.health -= thing.power;
   }
 
-  getCircle () {
-    const { x, y, size } = this._state;
-    return {
-      radius: size * 0.5,
-      x: x,
-      y: y
-    };
-  }
-
   update ( delta ) {
     const { x, y, direction, speed } = this._state;
     // get new coords
@@ -51,6 +43,19 @@ class Shot {
     // update the state
     this._state.x = pos.x;
     this._state.y = pos.y;
+
+
+    this._state.health -= delta / this._state.lifeSpan;
+    // this._state.power -= delta / this._state.lifeSpan;
+  }
+
+  get circle () {
+    const { x, y, size } = this._state;
+    return {
+      radius: size * 0.5,
+      x: x,
+      y: y
+    };
   }
 
   get power () {
@@ -68,29 +73,37 @@ class Shot {
 
 class Hero {
 
-  constructor ( canvas, direction = 0, x = 0, y = 0, health = 1 ) {
-    this._canvas = canvas;
-    this._state = {
-      direction: direction,
-      speed: 0, // px/s
-      acceleration: 100, // px/s
-      breaking: 200, // px/s
-      maxSpeed: 400, // px/s
-      turnSpeed: 100, // deg/s
-      x: x,
-      y: y,
-      // needed for collision and shots etc..
-      width: 100,
-      height: 109,
-      // every thing has health and power
-      health: health,
+  constructor ( canvas, props ) {
+
+    const defaultProps = {
+      _ready: true,
+      type: 'enemy',
+      name: 'Alien Saucer Class I',
+      health: 1,
       power: 1,
-      // shooting power/speed
-      shotSpeed: 900, // px/s
-      shotPower: 0.5, // px/s
+      size: 100,
+      speed: 0,
+      acceleration: 200,
+      breaking: 450,
+      maxSpeed: 800,
+      turnSpeed: 90,
+      x: 0,
+      y: 0,
+      direction: 0,
+      images: [],
+      shotHealth: 1,
+      shotPower: 0.1,
+      shotSpeed: 900,
+      shotLifeSpan: 1000,
       shots: []
     };
 
+    this._canvas = canvas;
+    this._state = Object.assign({}, defaultProps);
+    Object.assign(this._state, props);
+    this._state.circle = this.circle;
+
+    console.log(this.state);
   }
 
   getAnimation () {
@@ -150,9 +163,8 @@ class Hero {
 
   shoot () {
     const { direction, speed, shotSpeed, shotPower } = this._state;
-    const x = this.getCircle().x;
-    const y = this.getCircle().y;
-    const shot = new Shot( direction, x, y, speed + shotSpeed, shotPower );
+    const { x, y } = this.circle;
+    const shot = new Shot( direction, x, y, speed + shotSpeed, shotPower, 2 );
     this._state.shots.push( shot );
   }
 
@@ -170,15 +182,6 @@ class Hero {
     }
   }
 
-  getCircle () {
-    const { x, y, width, height } = this._state;
-    return {
-      radius: width + height * 0.25,
-      x: x + width * 0.5,
-      y: y + height * 0.5
-    };
-  }
-
   update ( delta ) {
     const { x, y, direction, speed } = this._state;
     // get new coords
@@ -189,12 +192,12 @@ class Hero {
 
     this._state.shots = this._state.shots.filter( ( shotInstance ) => {
       const shot = shotInstance.state;
-      if ( shot.x > this._canvas.width ||
-          shot.x < 0 ||
-          shot.y > this._canvas.height ||
-          shot.y < 0 ) {
-        return false;
-      }
+      // if ( shot.x > this._canvas.width ||
+      //     shot.x < 0 ||
+      //     shot.y > this._canvas.height ||
+      //     shot.y < 0 ) {
+      //   return false;
+      // }
 
       if ( shot.health <= 0 ) {
         return false; 
@@ -206,6 +209,19 @@ class Hero {
 
     // update the animation / image
     this._state.animation = this.getAnimation();
+    this._state.image = this.state.images[this.state.animation];
+
+    this._state.circle = this.circle;
+  }
+
+  get circle () {
+    const { x, y, size } = this._state;
+    const radius = size * 0.5;
+    return {
+      radius: radius,
+      x: x + radius,
+      y: y + radius
+    };
   }
 
   get power () {
