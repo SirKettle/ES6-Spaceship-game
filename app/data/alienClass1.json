@@ -1,0 +1,23 @@
+{
+  "type": "alien",
+  "name": "HJT Alien Ship Class I",
+  "health": 1,
+  "power": 1,
+  "size": 100,
+  "speed": 0,
+  "acceleration": 300,
+  "breaking": 450,
+  "maxSpeed": 1000,
+  "turnSpeed": 90,
+  "x": 0,
+  "y": 0,
+  "direction": 0,
+  "imageUrls": [
+    "alien_ship_square.png"
+  ],
+  "images": [],
+  "shotHealth": 2,
+  "shotPower": 0.2,
+  "shotSpeed": 900,
+  "shotLifeSpan": 200
+}

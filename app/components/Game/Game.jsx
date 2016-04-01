@@ -10,12 +10,8 @@ export default class GameComponent extends React.Component {
     hero: React.PropTypes.object,
     enemies: React.PropTypes.arrayOf(React.PropTypes.object),
     shots: React.PropTypes.arrayOf(React.PropTypes.object),
-    gameState: React.PropTypes.shape({
-      running: React.PropTypes.bool,
-      score: React.PropTypes.object,
-      hero: React.PropTypes.object,
-      data: React.PropTypes.object
-    }).isRequired,
+    score: React.PropTypes.object,
+    guides: React.PropTypes.bool,
     canvas: React.PropTypes.shape({
       width: React.PropTypes.number,
       height: React.PropTypes.number
@@ -24,7 +20,7 @@ export default class GameComponent extends React.Component {
   }
 
   renderScene( ctx, canvas ) {
-    const { hero, enemies, shots } = this.props;
+    const { hero, enemies, shots, guides } = this.props;
 
     const getXPositionOffset = ( thing, offsetThing ) => {
       const canvasCenter = canvas.width * 0.5 - offsetThing.size * 0.5;
@@ -38,51 +34,43 @@ export default class GameComponent extends React.Component {
 
     if ( !hero._ready ) { return };
 
-    ctx.fillStyle = '#00162f';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    // return;
+
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     // console.log(gameState);
 
     // canvasUtils.drawGrid( canvas, ctx );
 
+    // Draw the shots
     shots.forEach( ( shot ) => {
       canvasUtils.drawShot( canvas, ctx, getXPositionOffset( shot, hero ), getYPositionOffset( shot, hero ), shot.direction, shot.size, shot.health );
     });
 
+    // Draw the enemy ships
     enemies.forEach( ( enemy ) => {
-      canvasUtils.drawAlien( canvas, ctx, getXPositionOffset( enemy, hero ), getYPositionOffset( enemy, hero ), enemy.direction );
-      canvasUtils.drawHoop( ctx, getXPositionOffset( enemy.circle, hero ), getYPositionOffset( enemy.circle, hero ), enemy.circle.radius, '#ff0000' );
+      canvasUtils.drawThing( ctx, enemy, getXPositionOffset( enemy, hero ), getYPositionOffset( enemy, hero ), guides );
     });
-    // canvasUtils.drawTriangle( ctx, hero.x, hero.y, 20, '#f2f2f2', hero.direction );
-    // canvasUtils.drawShip( canvas, ctx, hero.x, hero.y, hero.direction );
-    canvasUtils.drawMovingGrid( canvas, ctx, hero );
 
-    // canvasUtils.drawDaddyShip( canvas, ctx, hero.x - 100, hero.y + 100, hero.direction, hero.animation );
-    // canvasUtils.drawDaddyShip( canvas, ctx, getXPositionOffset( hero, hero ), getYPositionOffset( hero, hero ), hero.direction, hero.image );
-    // canvasUtils.drawHoop( ctx, getXPositionOffset( hero.circle, hero ), getYPositionOffset( hero.circle, hero ), hero.circle.radius, 'rgba( 0, 255, 130, 0.5 )' );
+    // Draw our moving grid line guides
+    if ( guides ) {
+      canvasUtils.drawMovingGrid( canvas, ctx, hero );
+    }
 
-    canvasUtils.drawThing( ctx, hero, getXPositionOffset( hero, hero ), getYPositionOffset( hero, hero ) );
-    // temp alien
-    // canvasUtils.drawAlien( canvas, ctx, hero.x + 200, hero.y + 200, hero.direction );
-    // canvasUtils.drawAlien( canvas, ctx, hero.x - 200, hero.y - 200, hero.direction );
-    // canvasUtils.drawAlien( canvas, ctx, hero.x + 200, hero.y - 200, hero.direction );
-    // canvasUtils.drawAlien( canvas, ctx, hero.x - 200, hero.y + 200, hero.direction );
+    // Draw our player spaceship
+    canvasUtils.drawThing( ctx, hero, getXPositionOffset( hero, hero ), getYPositionOffset( hero, hero ), guides );
 
-
-    // ctx.translate( hero.x, hero.y );
-
+    // TODO: replace this with a simple div for performance
     this.paintScore( ctx );
-
-
   }
 
   paintScore ( ctx ) {
-    const { gameState, hero, shots } = this.props;
-    const score = gameState.score.score;
+    const { score, hero, shots } = this.props;
     ctx.fillStyle = '#ffffff';
     ctx.font = 'bold 26px sans-serif';
     ctx.fillText( parseInt(hero.x) + ' by ' + parseInt(hero.y) + ' - px/s: ' + parseInt(hero.speed) + ' - SHOTS: ' + shots.length, 40, 43);
+
+
   }
 
   componentDidMount() {
@@ -104,14 +92,13 @@ export default class GameComponent extends React.Component {
   render() {
 
     const { canvas, onCanvasClicked } = this.props;
+    const inlineStyles = {
+      backgroundImage: 'url(../../assets/space_bg.jpg)'
+    };
 
     return (
-      <div className={styles.Game}
-        style={
-          {
-            backgroundImage: 'url(../../assets/space_bg.jpg)'
-          }
-        }
+      <div className={ styles.Game }
+        style={ inlineStyles }
       >
         <canvas ref="gameCanvas"
           width={ canvas.width }

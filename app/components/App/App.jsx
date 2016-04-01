@@ -6,34 +6,36 @@ import AppActions from '../../actions/AppActions';
 import ItemsStore from '../../stores/ItemsStore';
 import Body from '../Body/Body';
 import Footer from '../Footer/Footer';
-import Hero from '../../class/Hero';
+import Ship from '../../class/Ship';
 import GameComponent from '../Game/Game';
-import KeyboardService from '../../services/Keyboard';
+import KeyboardControls from '../../services/KeyboardControls';
+import KeyboardActions from '../../services/KeyboardActions';
 import Game from '../../services/Game';
-import defaultKeyActions from '../../data/defaultKeyActions.json';
 import gameUtils from '../../util/game';
-import objectUtils from '../../util/object';
 
-require("file?!../../assets/will_ship_sp0.png");
-require("file?!../../assets/will_ship_sp1.png");
-require("file?!../../assets/will_ship_sp2.png");
-require("file?!../../assets/will_ship_sp3.png");
-require("file?!../../assets/will_ship_sp4.png");
-require("file?!../../assets/will_ship_sp5.png");
+import playerShipData from '../../data/playerShip.json';
+import alienClass1Data from '../../data/alienClass1.json';
 
-const daddyShipImages = [];
-daddyShipImages.push(document.createElement('img'));
-daddyShipImages.push(document.createElement('img'));
-daddyShipImages.push(document.createElement('img'));
-daddyShipImages.push(document.createElement('img'));
-daddyShipImages.push(document.createElement('img'));
-daddyShipImages.push(document.createElement('img'));
+const configs = {
+  playerShip: Object.assign({}, playerShipData),
+  alienClass1: Object.assign({}, alienClass1Data)
+};
 
-daddyShipImages.forEach( ( ds, index ) => {
-    ds.src = `/assets/will_ship_sp${ index }.png`;
+const injectImages = ( config ) => {
+  config.imageUrls.forEach( ( name ) => {
+    const img =  document.createElement( 'img' );
+    require( `file?!../../assets/${ name }` );
+    img.src = `/assets/${ name }`;
+    config.images.push( img );
+  });
+
+  return config;
+};
+
+Object.keys( configs ).forEach( ( key ) => {
+  let config = configs[ key ];
+  config = injectImages( config );
 });
-
-// const GameInstance = GameService.initGame();
 
 export default class App extends React.Component {
 
@@ -49,116 +51,62 @@ export default class App extends React.Component {
     hero: {},
     enemies: [],
     shots: [],
+    guides: false,
     score: {
-      score: 10
-    },
-    data: {
-      somethings: [ 1, 2, 3 ]
+      score: 0
     }
   }
 
-  subscriptions = [];
+  subscriptions = []
 
-  renderConsoleOutput = () => {
-    // TODO: This needs to iterate through an array/object to output anything
-    // needed in the console
-    return (
-      <div>
-        <h3>Console</h3>
-      </div>
-    );
-  }
+  playerShip = null
 
-  componentDidMount() {
+  otherShips = []
 
-    this.gameClock = Game.Clock(20);
-    const { canvasConfig } = this.props;
+  updateGame ( delta ) {
 
-    const initialHeroSettings = {
-      _ready: true,
-      type: 'hero',
-      name: 'Daddy Ship Class I',
-      health: 1,
-      power: 1,
-      size: 180,
-      speed: 0,
-      acceleration: 300,
-      breaking: 450,
-      maxSpeed: 1000,
-      turnSpeed: 90,
-      x: canvasConfig.width * 0.5,
-      y: canvasConfig.height * 0.5,
-      direction: 0,
-      images: daddyShipImages,
-      shotHealth: 2,
-      shotPower: 0.2,
-      shotSpeed: 900,
-      shotLifeSpan: 200
-    };
+    const allShots = this.playerShip.state.shots; // .concat(blah.shots..)
 
-    const hero = new Hero( canvasConfig, initialHeroSettings );
+    /* **** UPDATE THINGS **** */
+    // update the Player ship
+    this.playerShip.update( delta );
 
+    // update the other ships
+    this.otherShips.forEach( ( thing ) => {
+      thing.update( delta );
+    });
 
-    const enemy1 = new Hero( canvasConfig, { direction: 135 } );
-    
-    let allThings = [];
+    // update the shots
+    allShots.forEach( ( shot ) => {
+      shot.update( delta );
+    });
 
-    allThings.push( enemy1 );
+    /* **** COLLISION DETECTION **** */
+    // handle collisions between ships and ships
+    this.otherShips.forEach( ( thing ) => {
+      this.handleCollision( thing, this.playerShip );
+    });
 
-    this.gameClock.start();
-    // add actions to keyboard events
-    KeyboardService.Controller( this.gameClock, this.getKeyboardActions( hero ) );
-    this.gameClock.addAction( ( delta ) => {
-      // render scene here...
-      hero.update( delta );
-
-      let allShots = hero.state.shots; // .concat(blah.shots..)
-
-      allShots.forEach( ( shot ) => {
-        shot.update( delta );
+    // handle collisions between shots and ships
+    allShots.forEach( ( shot ) => {
+      // TODO: how to handle shots fired by firer - currently destroys self!
+      // this.handleCollision( shot, this.playerShip );
+      this.otherShips.forEach( ( thing ) => {
+        this.handleCollision( thing, shot );
       });
+    });
 
-      allThings.forEach( ( thing ) => {
-        thing.update( delta );
-      });
+    // TODO: paint collisions
+    // filter out dead ships after collisions
+    this.otherShips = this.otherShips.filter( ( ship ) => {
+      return ship.alive;
+    });
 
-      //coliision
-
-
-      allThings.forEach( ( thing ) => {
-        this.handleCollision( thing, hero );
-      });
-
-
-      allShots.forEach( ( shot ) => {
-        // this.handleCollision( shot, hero );
-
-        allThings.forEach( ( thing ) => {
-          this.handleCollision( thing, shot );
-        });
-
-      });
-
-      // need to paint collisions
-
-      allThings = allThings.filter( ( thing ) => {
-        return thing.alive;
-      });
-
-
-
-      this.setState({
-        hero: hero.state
-      });
-
-      this.setState({
-        enemies: allThings.map( ( thing ) => thing.state )
-      });
-
-      this.setState({
-        shots: allShots.map( ( shot ) => shot.state )
-      });
-      
+    /* **** UPDATE THE GAME'S STATE **** */
+    this.setState({
+      hero: this.playerShip.state,
+      enemies: this.otherShips.map( ( ship ) => ship.state ),
+      shots: allShots.map( ( shot ) => shot.state )
     });
   }
 
@@ -178,70 +126,90 @@ export default class App extends React.Component {
     return Boolean( distance < ( circle1.radius + circle2.radius ) );
   }
 
-  getKeyboardActions ( hero ) {
+  getKeyboardActions () {
 
-    const keyCodeActionMap = {};
-
-    const actions = {
-      left: ( delta ) => {
-        hero.turnLeft( delta );
-      },
-      right: ( delta ) => {
-        hero.turnRight( delta );
-      },
-      up: ( delta ) => {
-        hero.accelerate( delta );
-      },
-      down: ( delta ) => {
-        hero.decelerate( delta );
-      },
-      fire: ( delta ) => {
-        console.log('fire!');
-        hero.shoot();
-        // hero.shotCount++;
-        // console.log('hero.shotCount', hero.shotCount);
-      },
-      pause: () => {
+    const gameActions = {
+       pause: () => {
         console.log('pause toggle');
         this.gameClock.toggle();
       },
       roll: () => {
-        // console.log('roll - ' + gameUtils.rollDice());
+        console.log('roll - ' + gameUtils.rollDice());
+      },
+      guides: () => {
+        const guidesOn = this.state.guides;
+
+        // toggle guides
+        this.setState({
+          guides: !guidesOn
+        });
+
+        console.log('this.state.guides', this.state.guides);
       }
     };
 
-    Object.keys( defaultKeyActions ).forEach( ( key ) => {
-      const keyCodes = defaultKeyActions[key];
-      keyCodes.forEach( ( keyCode ) => {
-        keyCodeActionMap[ objectUtils.getSafeKey( keyCode ) ] = actions[key];
-      });
-    });
-
-    return keyCodeActionMap;
+    return KeyboardActions.getActions( this.playerShip, gameActions );
   }
 
-  componentWillUnmount() {
+  onCanvasClicked ( event ) {
+      console.log( event );
+  }
+
+  // react core methods
+
+  componentWillUnmount () {
 
     this.subscriptions.forEach( ( subscription) => {
       subscription.dispose();
     });
   }
 
-  render() {
+  componentDidMount () {
 
-    const onCanvasClicked = ( event ) => {
-      console.log(event);
-    };
+    this.gameClock = Game.Clock(20);
+    const { canvasConfig } = this.props;
+
+    const initPlayerShipSettings = Object.assign({}, configs.playerShip, {
+      x: canvasConfig.width * 0.5,
+      y: canvasConfig.height * 0.5,
+      _ready: true
+    });
+
+    this.playerShip = new Ship( canvasConfig, initPlayerShipSettings );
+
+    const enemySettings = Object.assign({}, configs.alienClass1, {
+      x: 200,
+      y: 300,
+      direction: 135,
+      _ready: true
+    });
+
+    const enemy1 = new Ship( canvasConfig, enemySettings );
+
+    this.otherShips = [];
+    this.otherShips.push( enemy1 );
+
+    this.gameClock.start();
+    // add actions to keyboard events
+    KeyboardControls.bind( this.gameClock, this.getKeyboardActions() );
+
+    this.gameClock.addAction( ( delta ) => {
+      this.updateGame( delta );
+    });
+  }
+
+  render () {
 
     return (
-      <div className={styles.app}>
+      <div className={ styles.app }>
         <GameComponent
           hero={ this.state.hero }
           enemies={ this.state.enemies }
           shots={ this.state.shots }
-          gameState={ this.state }
+          score={ this.state.score }
+          guides={ this.state.guides }
           canvas={ this.props.canvasConfig }
-          onCanvasClicked={ onCanvasClicked }
+          onCanvasClicked={ this.onCanvasClicked }
         />
       </div>
     );

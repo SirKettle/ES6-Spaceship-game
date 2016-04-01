@@ -23,7 +23,11 @@ class GameClock {
       this.lastTimeRun = newTime;
       Object.keys(this.actions).forEach( ( actionKey ) => {
         const action = this.actions[ actionKey ];
-        action( this.delta );
+        action.action( this.delta );
+
+        if ( action.onceOnly ) {
+          this.removeAction( actionKey );
+        }
       } );
       if (this.isRunning) {
         window.requestAnimationFrame( () => {
@@ -53,11 +57,14 @@ class GameClock {
       this.resetActions();
     }
 
-    addAction ( action ) {
+    addAction ( action, onceOnly = false ) {
       if ( !this.isRunning ) { return; }
       this.actionCount++;
       const actionKey = objectUtils.getSafeKey( this.actionCount );
-      this.actions[ actionKey ] = action;
+      this.actions[ actionKey ] = {
+        action: action,
+        onceOnly: onceOnly
+      };
       return actionKey;
     }
 

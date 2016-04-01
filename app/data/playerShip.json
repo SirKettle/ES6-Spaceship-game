@@ -1,0 +1,28 @@
+{
+  "type": "hero",
+  "name": "Daddy Ship Class I",
+  "health": 1,
+  "power": 1,
+  "size": 180,
+  "speed": 0,
+  "acceleration": 300,
+  "breaking": 450,
+  "maxSpeed": 1000,
+  "turnSpeed": 90,
+  "x": 0,
+  "y": 0,
+  "direction": 0,
+  "imageUrls": [
+    "will_ship_sp0.png",
+    "will_ship_sp1.png",
+    "will_ship_sp2.png",
+    "will_ship_sp3.png",
+    "will_ship_sp4.png",
+    "will_ship_sp5.png"
+  ],
+  "images": [],
+  "shotHealth": 2,
+  "shotPower": 0.2,
+  "shotSpeed": 900,
+  "shotLifeSpan": 200
+}
