@@ -1,6 +1,7 @@
 import styles from './_Game.scss';
 import React from 'react';
 import canvasUtils from '../../util/canvas';
+import gameUtils from '../../util/game';
 
 require("file?!../../assets/space_bg.jpg");
 
@@ -11,25 +12,30 @@ export default class GameComponent extends React.Component {
     enemies: React.PropTypes.arrayOf(React.PropTypes.object),
     shots: React.PropTypes.arrayOf(React.PropTypes.object),
     score: React.PropTypes.object,
-    guides: React.PropTypes.bool,
+    showGuides: React.PropTypes.bool,
+    showMap: React.PropTypes.bool,
     canvas: React.PropTypes.shape({
       width: React.PropTypes.number,
       height: React.PropTypes.number
+    }).isRequired,
+    map: React.PropTypes.shape({
+      width: React.PropTypes.number,
+      height: React.PropTypes.number,
+      direction: React.PropTypes.number,
+      ships: React.PropTypes.arrayOf(React.PropTypes.object)
     }).isRequired,
     onCanvasClicked: React.PropTypes.func
   }
 
   renderScene( ctx, canvas ) {
-    const { hero, enemies, shots, guides } = this.props;
+    const { hero, enemies, shots, map, showGuides, showMap } = this.props;
 
     const getXPositionOffset = ( thing, offsetThing ) => {
-      const canvasCenter = canvas.width * 0.5 - offsetThing.size * 0.5;
-      return thing.x - offsetThing.x + canvasCenter;
+      return gameUtils.getXPositionOffset( thing, offsetThing, canvas );
     };
 
     const getYPositionOffset = ( thing, offsetThing ) => {
-      const canvasCenter = canvas.height * 0.5;
-      return thing.y - offsetThing.y + canvasCenter - offsetThing.size * 0.5;
+      return gameUtils.getYPositionOffset( thing, offsetThing, canvas );
     };
 
     if ( !hero._ready ) { return };
@@ -49,16 +55,22 @@ export default class GameComponent extends React.Component {
 
     // Draw the enemy ships
     enemies.forEach( ( enemy ) => {
-      canvasUtils.drawThing( ctx, enemy, getXPositionOffset( enemy, hero ), getYPositionOffset( enemy, hero ), guides );
+      canvasUtils.drawThing( ctx, enemy, getXPositionOffset( enemy, hero ), getYPositionOffset( enemy, hero ), showGuides );
     });
 
     // Draw our moving grid line guides
-    if ( guides ) {
+    if ( showGuides ) {
       canvasUtils.drawMovingGrid( canvas, ctx, hero );
     }
 
     // Draw our player spaceship
-    canvasUtils.drawThing( ctx, hero, getXPositionOffset( hero, hero ), getYPositionOffset( hero, hero ), guides );
+    canvasUtils.drawThing( ctx, hero, getXPositionOffset( hero, hero ), getYPositionOffset( hero, hero ), showGuides );
+
+    if ( showMap ) {
+      if ( map.ships.length ) {
+        debugger;
+      }
+    }
 
     // TODO: replace this with a simple div for performance
     this.paintScore( ctx );

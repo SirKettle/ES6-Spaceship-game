@@ -9,6 +9,7 @@
   "onceOnly": {
     "pause": [ 80, 27 ],
     "roll": [ 82 ],
-    "guides": [ 71 ]
+    "guides": [ 71 ],
+    "map": [ 77 ]
   }
 }

@@ -1,0 +1,27 @@
+{
+  "type": "hero",
+  "name": "Harrison Ship Class I",
+  "health": 1,
+  "power": 1,
+  "size": 110,
+  "speed": 0,
+  "acceleration": 400,
+  "breaking": 450,
+  "maxSpeed": 1500,
+  "turnSpeed": 30,
+  "x": 0,
+  "y": 0,
+  "direction": 0,
+  "imageUrls": [
+    "harrison_ship_sp0.png",
+    "harrison_ship_sp1.png",
+    "harrison_ship_sp2.png",
+    "harrison_ship_sp3.png",
+    "harrison_ship_sp4.png"
+  ],
+  "images": [],
+  "shotHealth": 2,
+  "shotPower": 0.2,
+  "shotSpeed": 1200,
+  "shotLifeSpan": 200
+}

@@ -14,11 +14,15 @@ import Game from '../../services/Game';
 import gameUtils from '../../util/game';
 
 import playerShipData from '../../data/playerShip.json';
+import harrisonShipData from '../../data/harrisonShip.json';
 import alienClass1Data from '../../data/alienClass1.json';
+import alienClass2Data from '../../data/alienClass2.json';
 
 const configs = {
   playerShip: Object.assign({}, playerShipData),
-  alienClass1: Object.assign({}, alienClass1Data)
+  harrisonShip: Object.assign({}, harrisonShipData),
+  alienClass1: Object.assign({}, alienClass1Data),
+  alienClass2: Object.assign({}, alienClass2Data)
 };
 
 const injectImages = ( config ) => {
@@ -51,10 +55,12 @@ export default class App extends React.Component {
     hero: {},
     enemies: [],
     shots: [],
-    guides: false,
+    showGuides: true,
+    showMap: false,
     score: {
       score: 0
-    }
+    },
+    map: {}
   }
 
   subscriptions = []
@@ -106,8 +112,39 @@ export default class App extends React.Component {
     this.setState({
       hero: this.playerShip.state,
       enemies: this.otherShips.map( ( ship ) => ship.state ),
-      shots: allShots.map( ( shot ) => shot.state )
+      shots: allShots.map( ( shot ) => shot.state ),
+      map: this.getMapState()
     });
+  }
+
+  getMapState () {
+
+    const mapScale = 9;
+    const mapSize = 0.5;
+    const scaleFactor = ( 1 / mapScale ) * mapSize;
+    const mapCanvas = {
+      width: this.props.canvasConfig.width * mapScale,
+      height: this.props.canvasConfig.height * mapScale
+    };
+
+    let otherShipsCoords = [];
+
+    // if ( this.state.showMap ) {
+      otherShipsCoords = this.otherShips.map( ( ship ) => {
+        return {
+          x: Math.floor( gameUtils.getXPositionOffset( ship.state, this.playerShip.state, mapCanvas ) * scaleFactor ),
+          y: Math.floor( gameUtils.getYPositionOffset( ship.state, this.playerShip.state, mapCanvas ) * scaleFactor )
+        }
+      });
+    // }
+
+
+    return {
+      direction: this.playerShip.state.direction,
+      ships: otherShipsCoords,
+      width: Math.floor( mapCanvas.width * scaleFactor ),
+      height: Math.floor( mapCanvas.height * scaleFactor )
+    };
   }
 
   handleCollision = ( thing1, thing2 ) => {
@@ -137,14 +174,10 @@ export default class App extends React.Component {
         console.log('roll - ' + gameUtils.rollDice());
       },
       guides: () => {
-        const guidesOn = this.state.guides;
-
-        // toggle guides
-        this.setState({
-          guides: !guidesOn
-        });
-
-        console.log('this.state.guides', this.state.guides);
+        this.setState({ showGuides: !this.state.showGuides }); // toggle guides
+      },
+      map: () => {
+        this.setState({ showMap: !this.state.showMap }); // toggle map
       }
     };
 
@@ -169,25 +202,36 @@ export default class App extends React.Component {
     this.gameClock = Game.Clock(20);
     const { canvasConfig } = this.props;
 
-    const initPlayerShipSettings = Object.assign({}, configs.playerShip, {
+    // const shipConfig = configs.harrisonShip;
+    const shipConfig = configs.playerShip;
+
+    this.playerShip = new Ship( canvasConfig, Object.assign({}, shipConfig, {
       x: canvasConfig.width * 0.5,
       y: canvasConfig.height * 0.5,
       _ready: true
-    });
+    }) );
 
-    this.playerShip = new Ship( canvasConfig, initPlayerShipSettings );
+    const enemySettings = );
 
-    const enemySettings = Object.assign({}, configs.alienClass1, {
+    const enemy1 = new Ship( canvasConfig, Object.assign({}, configs.alienClass1, {
       x: 200,
       y: 300,
+      speed: 40,
       direction: 135,
       _ready: true
-    });
-
-    const enemy1 = new Ship( canvasConfig, enemySettings );
+    }) );
+    
+    const enemy2 = new Ship( canvasConfig, Object.assign({}, configs.alienClass2, {
+      x: 500,
+      y: 200,
+      speed: 400,
+      direction: 20,
+      _ready: true
+    }) );
 
     this.otherShips = [];
     this.otherShips.push( enemy1 );
+    this.otherShips.push( enemy2 );
 
     this.gameClock.start();
     // add actions to keyboard events
@@ -207,7 +251,9 @@ export default class App extends React.Component {
           enemies={ this.state.enemies }
           shots={ this.state.shots }
           score={ this.state.score }
-          guides={ this.state.guides }
+          map={ this.state.map }
+          showGuides={ this.state.showGuides }
+          showMap={ this.state.showMap }
           canvas={ this.props.canvasConfig }
           onCanvasClicked={ this.onCanvasClicked }
         />

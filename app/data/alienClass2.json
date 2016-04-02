@@ -1,0 +1,27 @@
+{
+  "type": "alien",
+  "name": "HJT Alien Ship Class II",
+  "health": 1,
+  "power": 1,
+  "size": 110,
+  "speed": 0,
+  "acceleration": 400,
+  "breaking": 150,
+  "maxSpeed": 1500,
+  "turnSpeed": 200,
+  "x": 0,
+  "y": 0,
+  "direction": 0,
+  "imageUrls": [
+    "alien_class2_sp0.png",
+    "alien_class2_sp1.png",
+    "alien_class2_sp2.png",
+    "alien_class2_sp3.png",
+    "alien_class2_sp4.png"
+  ],
+  "images": [],
+  "shotHealth": 2,
+  "shotPower": 0.2,
+  "shotSpeed": 1200,
+  "shotLifeSpan": 200
+}
