@@ -129,15 +129,14 @@ export default class App extends React.Component {
 
     let otherShipsCoords = [];
 
-    // if ( this.state.showMap ) {
+    if ( this.state.showMap ) {
       otherShipsCoords = this.otherShips.map( ( ship ) => {
         return {
           x: Math.floor( gameUtils.getXPositionOffset( ship.state, this.playerShip.state, mapCanvas ) * scaleFactor ),
           y: Math.floor( gameUtils.getYPositionOffset( ship.state, this.playerShip.state, mapCanvas ) * scaleFactor )
         }
       });
-    // }
-
+    }
 
     return {
       direction: this.playerShip.state.direction,
@@ -211,8 +210,6 @@ export default class App extends React.Component {
       _ready: true
     }) );
 
-    const enemySettings = );
-
     const enemy1 = new Ship( canvasConfig, Object.assign({}, configs.alienClass1, {
       x: 200,
       y: 300,
@@ -220,7 +217,7 @@ export default class App extends React.Component {
       direction: 135,
       _ready: true
     }) );
-    
+
     const enemy2 = new Ship( canvasConfig, Object.assign({}, configs.alienClass2, {
       x: 500,
       y: 200,
