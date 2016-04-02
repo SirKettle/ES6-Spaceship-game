@@ -1,10 +1,12 @@
 {
   "repeating": {
-    "left": [ 37, 90 ],
-    "right": [ 39, 88 ],
+    "left": [ 90 ],
+    "right": [ 88 ],
     "up": [ 38, 75 ],
     "down": [ 40, 77 ],
-    "fire": [ 32, 13, 76 ]
+    "fire": [ 32, 13, 76 ],
+    "strafeLeft": [ 37 ],
+    "strafeRight": [ 39 ]
   },
   "onceOnly": {
     "pause": [ 80, 27 ],

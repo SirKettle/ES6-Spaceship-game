@@ -6,8 +6,17 @@ class Actor {
     this._canvas = canvas;
     this._state = Object.assign({}, defaultProps, props);
     this._state.circle = this.circle;
+  }
 
-    console.log(this.state);
+  changeDirection ( turnBy ) {
+    turnBy = turnBy % 360;
+    let newDirection = this.state.direction + turnBy;
+
+    if ( newDirection < 0 ) {
+      newDirection = 360 + newDirection;
+    }
+
+    return newDirection % 360;
   }
 
   getPosition ( delta, x, y, direction, speed ) {
@@ -29,7 +38,7 @@ class Actor {
   }
 
   get circle () {
-    const { x, y, size } = this._state;
+    const { x, y, size } = this.state;
     const radius = size * 0.5;
     return {
       radius: radius,
@@ -51,11 +60,15 @@ class Actor {
   }
 
   get power () {
-    return this._state.power;
+    return this.state.power;
+  }
+
+  get health () {
+    return this.state.health;
   }
 
   get alive () {
-    return this._state.health > 0;
+    return this.health > 0;
   }
 
   get state () {

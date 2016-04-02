@@ -13,6 +13,12 @@ const KeyboardActions = {
       right: ( delta ) => {
         ship.turnRight( delta );
       },
+      strafeLeft: ( delta ) => {
+        ship.strafeLeft( delta );
+      },
+      strafeRight: ( delta ) => {
+        ship.strafeRight( delta );
+      },
       up: ( delta ) => {
         ship.accelerate( delta );
       },
