@@ -56,7 +56,7 @@ export default class App extends React.Component {
     enemies: [],
     shots: [],
     showGuides: true,
-    showMap: false,
+    showMap: true,
     score: {
       score: 0
     },
@@ -119,8 +119,8 @@ export default class App extends React.Component {
 
   getMapState () {
 
-    const mapScale = 9;
-    const mapSize = 0.5;
+    const mapScale = 50;
+    const mapSize = 0.25;
     const scaleFactor = ( 1 / mapScale ) * mapSize;
     const mapCanvas = {
       width: this.props.canvasConfig.width * mapScale,

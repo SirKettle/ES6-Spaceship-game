@@ -1,4 +1,18 @@
 
 .Game {
+	position: relative;
 	background-size: cover;
+}
+
+.CanvasGame {
+	position: absolute;
+	top: 0; left: 0;
+	z-index: 1;
+}
+
+.CanvasMap {
+	position: absolute;
+	bottom: 20px; right: 20px;
+	z-index: 2;
+	pointer-events: none;
 }

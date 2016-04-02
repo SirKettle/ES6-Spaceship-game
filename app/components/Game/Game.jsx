@@ -8,12 +8,6 @@ require("file?!../../assets/space_bg.jpg");
 export default class GameComponent extends React.Component {
 
   static propTypes = {
-    hero: React.PropTypes.object,
-    enemies: React.PropTypes.arrayOf(React.PropTypes.object),
-    shots: React.PropTypes.arrayOf(React.PropTypes.object),
-    score: React.PropTypes.object,
-    showGuides: React.PropTypes.bool,
-    showMap: React.PropTypes.bool,
     canvas: React.PropTypes.shape({
       width: React.PropTypes.number,
       height: React.PropTypes.number
@@ -24,11 +18,21 @@ export default class GameComponent extends React.Component {
       direction: React.PropTypes.number,
       ships: React.PropTypes.arrayOf(React.PropTypes.object)
     }).isRequired,
+    hero: React.PropTypes.object,
+    enemies: React.PropTypes.arrayOf(React.PropTypes.object),
+    shots: React.PropTypes.arrayOf(React.PropTypes.object),
+    score: React.PropTypes.object,
+    showGuides: React.PropTypes.bool,
+    showMap: React.PropTypes.bool,
     onCanvasClicked: React.PropTypes.func
   }
 
-  renderScene( ctx, canvas ) {
-    const { hero, enemies, shots, map, showGuides, showMap } = this.props;
+  contexts = {}
+
+  canvases = {}
+
+  renderGameCanvas = ( ctx ) => {
+    const { canvas, map, hero, enemies, shots, showGuides, showMap } = this.props;
 
     const getXPositionOffset = ( thing, offsetThing ) => {
       return gameUtils.getXPositionOffset( thing, offsetThing, canvas );
@@ -38,15 +42,10 @@ export default class GameComponent extends React.Component {
       return gameUtils.getYPositionOffset( thing, offsetThing, canvas );
     };
 
-    if ( !hero._ready ) { return };
-
-    // return;
-
+    // clear the canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // console.log(gameState);
-
-    // canvasUtils.drawGrid( canvas, ctx );
+    if ( !hero._ready ) { return };
 
     // Draw the shots
     shots.forEach( ( shot ) => {
@@ -66,14 +65,24 @@ export default class GameComponent extends React.Component {
     // Draw our player spaceship
     canvasUtils.drawThing( ctx, hero, getXPositionOffset( hero, hero ), getYPositionOffset( hero, hero ), showGuides );
 
-    if ( showMap ) {
-      if ( map.ships.length ) {
-        debugger;
-      }
-    }
-
     // TODO: replace this with a simple div for performance
     this.paintScore( ctx );
+  }
+
+  renderMapCanvas = ( ctx ) => {
+    const { map, showMap } = this.props;
+
+    // clear the canvas
+    ctx.clearRect(0, 0, map.width, map.height);
+
+    if ( showMap ) {
+      canvasUtils.drawMap( ctx, map );
+    }
+  }
+
+  renderScene ( canvases ) {
+    this.renderGameCanvas( this.contexts.game );
+    this.renderMapCanvas( this.contexts.map );
   }
 
   paintScore ( ctx ) {
@@ -81,31 +90,36 @@ export default class GameComponent extends React.Component {
     ctx.fillStyle = '#ffffff';
     ctx.font = 'bold 26px sans-serif';
     ctx.fillText( parseInt(hero.x) + ' by ' + parseInt(hero.y) + ' - px/s: ' + parseInt(hero.speed) + ' - SHOTS: ' + shots.length, 40, 43);
-
-
   }
 
   componentDidMount() {
-    const { canvas, onCanvasClicked } = this.props;
-    const canvasElem = this.refs.gameCanvas.getDOMNode();
-    const ctx = canvasElem.getContext('2d');
+    this.canvases = {
+      game: this.refs.gameCanvas.getDOMNode(),
+      map: this.refs.mapCanvas.getDOMNode()
+    };
 
-    this.renderScene( ctx, canvas );
+    Object.keys( this.canvases ).forEach( ( canvasKey ) => {
+      const canvasElem = this.canvases[ canvasKey ];
+      this.contexts[ canvasKey ] = canvasElem.getContext('2d');
+    });
+
+    this.renderScene();
   }
 
   componentDidUpdate() {
-    const { canvas, onCanvasClicked } = this.props;
-    const canvasElem = this.refs.gameCanvas.getDOMNode();
-    const ctx = canvasElem.getContext('2d');
-
-    this.renderScene( ctx, canvas );
+    this.renderScene();
   }
 
   render() {
 
-    const { canvas, onCanvasClicked } = this.props;
+    const { canvas, map, onCanvasClicked } = this.props;
     const inlineStyles = {
-      backgroundImage: 'url(../../assets/space_bg.jpg)'
+      backgroundImage: 'url(../../assets/space_bg.jpg)',
+      width: canvas.width,
+      height: canvas.height
+    };
+
+    const gameCanvasStyles = {
     };
 
     return (
@@ -113,9 +127,17 @@ export default class GameComponent extends React.Component {
         style={ inlineStyles }
       >
         <canvas ref="gameCanvas"
+          className={ styles.CanvasGame }
           width={ canvas.width }
           height={ canvas.height }
           onClick={ onCanvasClicked }
+          style={ gameCanvasStyles }
+        />
+
+        <canvas ref="mapCanvas"
+          className={ styles.CanvasMap }
+          width={ map.width }
+          height={ map.height }
         />
       </div>
     );
