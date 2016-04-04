@@ -2,6 +2,8 @@ import gameUtils from '../util/game';
 
 class Shot {
 
+  // TODO - extend dumb moving object (ie shit) - extends actor
+
   constructor ( direction, x, y, speed = 1000, power = 1, health = 1, lifeSpan = 300, size = 6, color = '#ffff00' ) {
     this._state = {
       direction: direction,

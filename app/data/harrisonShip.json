@@ -8,7 +8,7 @@
   "acceleration": 400,
   "breaking": 450,
   "maxSpeed": 1500,
-  "turnSpeed": 30,
+  "turnSpeed": 60,
   "x": 0,
   "y": 0,
   "direction": 0,

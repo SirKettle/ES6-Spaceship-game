@@ -37,12 +37,12 @@ const canvasUtils = {
   },
 
   drawMap: ( ctx, map ) => {
-    const shipColor = 'rgba( 250, 100, 100, 0.5)';
+    const shipColor = 'rgba( 250, 200, 100, 1)';
     ctx.strokeStyle = 'rgba( 250, 200, 100, 1)';
     ctx.strokeRect( 0, 0, map.width, map.height);
 
     (map.ships || []).forEach( ( ship ) => {
-        canvasUtils.drawCircle( ctx, ship.x, ship.y, 3, shipColor );
+        canvasUtils.drawCircle( ctx, ship.x, ship.y, 2, shipColor );
     });
   },
 

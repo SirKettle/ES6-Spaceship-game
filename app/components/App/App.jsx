@@ -119,7 +119,7 @@ export default class App extends React.Component {
 
   getMapState () {
 
-    const mapScale = 50;
+    const mapScale = 20;
     const mapSize = 0.25;
     const scaleFactor = ( 1 / mapScale ) * mapSize;
     const mapCanvas = {
@@ -201,8 +201,8 @@ export default class App extends React.Component {
     this.gameClock = Game.Clock(20);
     const { canvasConfig } = this.props;
 
-    // const shipConfig = configs.harrisonShip;
-    const shipConfig = configs.playerShip;
+    const shipConfig = configs.harrisonShip;
+    // const shipConfig = configs.playerShip;
 
     this.playerShip = new Ship( canvasConfig, Object.assign({}, shipConfig, {
       x: canvasConfig.width * 0.5,
