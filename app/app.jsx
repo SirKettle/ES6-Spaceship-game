@@ -5,18 +5,11 @@ import 'normalize.css/normalize.css';
 import './scss/app.scss';
 
 import React from 'react';
-import App from './components/App/App';
+import ReactDOM from 'react-dom';
+import { Router, Route, hashHistory } from 'react-router';
+import routes from './routes';
 
-document.addEventListener( 'DOMContentLoaded', ( event ) => {
-	setTimeout( () => {
-		const canvasConfig = {
-		  width: document.body.clientWidth,
-		  height: document.body.clientHeight
-		};
-		React.render(
-		  <App canvasConfig={ canvasConfig } />,
-		  document.getElementById('app')
-		);
-	});
-});
-
+ReactDOM.render(
+  <Router history={ hashHistory } routes={ routes } />,
+  document.getElementById('app')
+);
