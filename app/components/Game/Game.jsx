@@ -94,8 +94,8 @@ export default class GameComponent extends React.Component {
 
   componentDidMount() {
     this.canvases = {
-      game: this.refs.gameCanvas.getDOMNode(),
-      map: this.refs.mapCanvas.getDOMNode()
+      game: this.refs.gameCanvas,
+      map: this.refs.mapCanvas
     };
 
     Object.keys( this.canvases ).forEach( ( canvasKey ) => {

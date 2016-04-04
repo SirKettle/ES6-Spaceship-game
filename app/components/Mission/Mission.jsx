@@ -181,6 +181,10 @@ export default class MissionComponent extends React.Component {
 
   componentWillUnmount () {
 
+    this.gameClock.stop();
+    this.gameClock = null;
+
+
     this.subscriptions.forEach( ( subscription) => {
       subscription.dispose();
     });
@@ -197,7 +201,7 @@ export default class MissionComponent extends React.Component {
       canvas: canvasConfig
     });
 
-    this.gameClock = Game.Clock(20);
+    this.gameClock = Game.Clock();
 
     const shipConfig = configs.harrisonShip;
     // const shipConfig = configs.playerShip;

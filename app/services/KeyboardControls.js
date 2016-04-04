@@ -20,6 +20,8 @@ const bind = ( GameClock, keyActions ) => {
           return;
         }
 
+        event.preventDefault();
+
         if ( keyAction.onceOnly ) {
           const onceOnly = true;
           GameClock.addAction( keyAction.action, onceOnly );
@@ -36,6 +38,7 @@ const bind = ( GameClock, keyActions ) => {
     document.onkeyup = ( event ) => {
         const key = objectUtils.getSafeKey( event.key || event.which );
         if ( actionIds[key] ) {
+          event.preventDefault();
           GameClock.removeAction( actionIds[key] );
           delete actionIds[key];
         }
