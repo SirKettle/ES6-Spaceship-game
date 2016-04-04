@@ -1,10 +1,6 @@
-import styles from './_App.scss';
+import styles from './_Mission.scss';
 
 import React from 'react';
-import Rx from 'rx';
-import AppActions from '../../actions/AppActions';
-import ItemsStore from '../../stores/ItemsStore';
-import Body from '../Body/Body';
 import Footer from '../Footer/Footer';
 import Ship from '../../class/Ship';
 import GameComponent from '../Game/Game';
@@ -41,16 +37,10 @@ Object.keys( configs ).forEach( ( key ) => {
   config = injectImages( config );
 });
 
-export default class App extends React.Component {
-
-  static propTypes = {
-    canvasConfig: React.PropTypes.shape({
-      width: React.PropTypes.number,
-      height: React.PropTypes.number
-    })
-  }
+export default class MissionComponent extends React.Component {
 
   state = {
+    canvas: {},
     running: true,
     hero: {},
     enemies: [],
@@ -123,8 +113,8 @@ export default class App extends React.Component {
     const mapSize = 0.25;
     const scaleFactor = ( 1 / mapScale ) * mapSize;
     const mapCanvas = {
-      width: this.props.canvasConfig.width * mapScale,
-      height: this.props.canvasConfig.height * mapScale
+      width: this.state.canvas.width * mapScale,
+      height: this.state.canvas.height * mapScale
     };
 
     let otherShipsCoords = [];
@@ -198,8 +188,16 @@ export default class App extends React.Component {
 
   componentDidMount () {
 
+    const canvasConfig = {
+      width: document.body.clientWidth,
+      height: document.body.clientHeight
+    };
+
+    this.setState({
+      canvas: canvasConfig
+    });
+
     this.gameClock = Game.Clock(20);
-    const { canvasConfig } = this.props;
 
     const shipConfig = configs.harrisonShip;
     // const shipConfig = configs.playerShip;
@@ -242,7 +240,7 @@ export default class App extends React.Component {
   render () {
 
     return (
-      <div className={ styles.app }>
+      <div className={ styles.Mission }>
         <GameComponent
           hero={ this.state.hero }
           enemies={ this.state.enemies }
@@ -251,9 +249,10 @@ export default class App extends React.Component {
           map={ this.state.map }
           showGuides={ this.state.showGuides }
           showMap={ this.state.showMap }
-          canvas={ this.props.canvasConfig }
+          canvas={ this.state.canvas }
           onCanvasClicked={ this.onCanvasClicked }
         />
+        <Footer />
       </div>
     );
   }
