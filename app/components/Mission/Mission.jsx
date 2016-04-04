@@ -57,9 +57,11 @@ export default class MissionComponent extends React.Component {
 
   playerShip = null
 
-  otherShips = []
+  gameClock = null
 
-  updateGame ( delta ) {
+  otherShips = [] // move this - should just be in mission settings
+
+  updateGame ( delta, mission ) {
 
     const allShots = this.playerShip.state.shots; // .concat(blah.shots..)
 
@@ -68,7 +70,7 @@ export default class MissionComponent extends React.Component {
     this.playerShip.update( delta );
 
     // update the other ships
-    this.otherShips.forEach( ( thing ) => {
+    mission.otherShips.forEach( ( thing ) => {
       thing.update( delta );
     });
 
@@ -79,35 +81,35 @@ export default class MissionComponent extends React.Component {
 
     /* **** COLLISION DETECTION **** */
     // handle collisions between ships and ships
-    this.otherShips.forEach( ( thing ) => {
-      this.handleCollision( thing, this.playerShip );
+    mission.otherShips.forEach( ( thing ) => {
+      gameUtils.handleCollision( thing, this.playerShip );
     });
 
     // handle collisions between shots and ships
     allShots.forEach( ( shot ) => {
       // TODO: how to handle shots fired by firer - currently destroys self!
       // this.handleCollision( shot, this.playerShip );
-      this.otherShips.forEach( ( thing ) => {
-        this.handleCollision( thing, shot );
+      mission.otherShips.forEach( ( thing ) => {
+        gameUtils.handleCollision( thing, shot );
       });
     });
 
     // TODO: paint collisions
     // filter out dead ships after collisions
-    this.otherShips = this.otherShips.filter( ( ship ) => {
+    mission.otherShips = mission.otherShips.filter( ( ship ) => {
       return ship.alive;
     });
 
     /* **** UPDATE THE GAME'S STATE **** */
     this.setState({
       hero: this.playerShip.state,
-      enemies: this.otherShips.map( ( ship ) => ship.state ),
+      enemies: mission.otherShips.map( ( ship ) => ship.state ),
       shots: allShots.map( ( shot ) => shot.state ),
-      map: this.getMapState()
+      map: this.getMapState( mission )
     });
   }
 
-  getMapState () {
+  getMapState ( mission ) {
 
     const mapScale = 20;
     const mapSize = 0.25;
@@ -120,7 +122,7 @@ export default class MissionComponent extends React.Component {
     let otherShipsCoords = [];
 
     if ( this.state.showMap ) {
-      otherShipsCoords = this.otherShips.map( ( ship ) => {
+      otherShipsCoords = mission.otherShips.map( ( ship ) => {
         return {
           x: Math.floor( gameUtils.getXPositionOffset( ship.state, this.playerShip.state, mapCanvas ) * scaleFactor ),
           y: Math.floor( gameUtils.getYPositionOffset( ship.state, this.playerShip.state, mapCanvas ) * scaleFactor )
@@ -134,22 +136,6 @@ export default class MissionComponent extends React.Component {
       width: Math.floor( mapCanvas.width * scaleFactor ),
       height: Math.floor( mapCanvas.height * scaleFactor )
     };
-  }
-
-  handleCollision = ( thing1, thing2 ) => {
-    const isCollision = this.getIsCollision( thing1.circle, thing2.circle );
-
-    if ( isCollision ) {
-      thing1.hit( thing2 );
-      thing2.hit( thing1 );
-    }
-  }
-
-  getIsCollision = ( circle1, circle2 ) => {
-    const dx = Math.abs( circle1.x - circle2.x );
-    const dy = Math.abs( circle1.y - circle2.y );
-    const distance = Math.sqrt( dx * dx + dy * dy );
-    return Boolean( distance < ( circle1.radius + circle2.radius ) );
   }
 
   getKeyboardActions () {
@@ -177,6 +163,10 @@ export default class MissionComponent extends React.Component {
       console.log( event );
   }
 
+  loadMission ( mission ) {
+
+  }
+
   // react core methods
 
   componentWillUnmount () {
@@ -192,10 +182,47 @@ export default class MissionComponent extends React.Component {
 
   componentDidMount () {
 
+    const missionSettings = {
+      playerShip: {
+        type: 'harrisonShip',
+        settings: {
+          x: canvasConfig.width * 0.5,
+          y: canvasConfig.height * 0.5,
+          _ready: true
+        }
+      },
+      initial: {
+        ships: [
+          {
+            type: 'alienClass1',
+            settings: {
+              x: 200,
+              y: 300,
+              speed: 40,
+              direction: 135,
+              _ready: true
+            }
+          },
+          {
+            type: 'alienClass2',
+            settings: {
+              x: 500,
+              y: 200,
+              speed: 400,
+              direction: 20,
+              _ready: true
+            }
+          }
+        ]
+      }
+    };
+
     const canvasConfig = {
       width: document.body.clientWidth,
       height: document.body.clientHeight
     };
+
+    const mission = {};
 
     this.setState({
       canvas: canvasConfig
@@ -204,40 +231,33 @@ export default class MissionComponent extends React.Component {
     this.gameClock = Game.Clock();
 
     const shipConfig = configs.harrisonShip;
-    // const shipConfig = configs.playerShip;
 
-    this.playerShip = new Ship( canvasConfig, Object.assign({}, shipConfig, {
-      x: canvasConfig.width * 0.5,
-      y: canvasConfig.height * 0.5,
-      _ready: true
-    }) );
+    this.playerShip = new Ship(
+      canvasConfig,
+      Object.assign(
+        {},
+        configs[ missionSettings.playerShip.type ],
+        missionSettings.playerShip.settings
+      )
+    );
 
-    const enemy1 = new Ship( canvasConfig, Object.assign({}, configs.alienClass1, {
-      x: 200,
-      y: 300,
-      speed: 40,
-      direction: 135,
-      _ready: true
-    }) );
-
-    const enemy2 = new Ship( canvasConfig, Object.assign({}, configs.alienClass2, {
-      x: 500,
-      y: 200,
-      speed: 400,
-      direction: 20,
-      _ready: true
-    }) );
-
-    this.otherShips = [];
-    this.otherShips.push( enemy1 );
-    this.otherShips.push( enemy2 );
+    mission.otherShips = missionSettings.initial.ships.map( ( ship ) => {
+      return new Ship(
+        canvasConfig,
+        Object.assign(
+          {},
+          configs[ ship.type ],
+          ship.settings
+        )
+      );
+    });
 
     this.gameClock.start();
     // add actions to keyboard events
     KeyboardControls.bind( this.gameClock, this.getKeyboardActions() );
 
     this.gameClock.addAction( ( delta ) => {
-      this.updateGame( delta );
+      this.updateGame( delta, mission );
     });
   }
 
