@@ -44,6 +44,7 @@ class GameClock {
       // this.intervalId = window.setInterval( () => {
       // }, this.delta );
       this.isRunning = true;
+      this.lastTimeRun = Date.now();
       this.run();
     }
 
@@ -57,7 +58,11 @@ class GameClock {
       this.resetActions();
     }
 
-    addAction ( action, onceOnly = false ) {
+    addAction ( action, onceOnly = false, alwaysRun = false ) {
+      if ( alwaysRun ) {
+        action();
+        return;
+      }
       if ( !this.isRunning ) { return; }
       this.actionCount++;
       const actionKey = objectUtils.getSafeKey( this.actionCount );
