@@ -71,12 +71,13 @@ const canvasUtils = {
     ctx.fill();
   },
 
-  drawHoop: ( ctx, x, y, size, color = '#000000' ) => {
+  drawHoop: ( ctx, x, y, size, color = '#000000', strokeSize = 1 ) => {
     //draw a circle
     ctx.strokeStyle = color;
     ctx.beginPath();
     ctx.arc( x, y, size, 0, Math.PI * 2, true );
     ctx.closePath();
+    ctx.lineWidth = strokeSize;
     ctx.stroke();
   },
 
@@ -91,6 +92,12 @@ const canvasUtils = {
     ctx.rotate( radians );
     ctx.drawImage( image, -image.width * 0.5, -image.width * 0.5 );
     ctx.restore();
+
+    // draw the health status
+    let healthColor = guidesColor;
+    if ( thing.health < 1 ) { healthColor = '#ddaa00'; }
+    if ( thing.health < 0.5 ) { healthColor = '#ff0000'; }
+    canvasUtils.drawHoop( ctx, x + thing.size * 0.5, y + thing.size * 0.5, circle.radius - 5, healthColor, 3);
 
     if ( showGuides ) {
         // todo - make the cross hairs bigger than the circle

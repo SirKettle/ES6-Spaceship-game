@@ -39,6 +39,46 @@ Object.keys( configs ).forEach( ( key ) => {
 
 export default class MissionComponent extends React.Component {
 
+  static propTypes = {
+    missionData: React.PropTypes.shape({
+      playerShip: React.PropTypes.object,
+      ships: React.PropTypes.arrayOf(React.PropTypes.object)
+    })
+  }
+
+  static defaultProps = {
+    missionData: {
+      playerShip: {
+        type: 'harrisonShip',
+        settings: {
+          _ready: true
+        }
+      },
+      ships: [
+        {
+          type: 'alienClass1',
+          settings: {
+            x: 200,
+            y: 300,
+            speed: 40,
+            direction: 135,
+            _ready: true
+          }
+        },
+        {
+          type: 'alienClass2',
+          settings: {
+            x: 500,
+            y: 200,
+            speed: 400,
+            direction: 20,
+            _ready: true
+          }
+        }
+      ]
+    }
+  }
+
   state = {
     canvas: {},
     running: true,
@@ -58,8 +98,6 @@ export default class MissionComponent extends React.Component {
   playerShip = null
 
   gameClock = null
-
-  otherShips = [] // move this - should just be in mission settings
 
   updateGame ( delta, mission ) {
 
@@ -163,8 +201,61 @@ export default class MissionComponent extends React.Component {
       console.log( event );
   }
 
-  loadMission ( mission ) {
+  reset () {
 
+  }
+
+  save () {
+    
+  }
+
+  // missionData could be the initial config or an
+  // extended saved game
+  loadMission ( missionData ) {
+
+    this.reset();
+
+    const mission = {};
+    const canvasConfig = {
+      width: document.body.clientWidth,
+      height: document.body.clientHeight
+    };
+
+    this.setState({
+      canvas: canvasConfig
+    });
+
+    this.playerShip = new Ship(
+      canvasConfig,
+      Object.assign(
+        {
+          x: canvasConfig.width * 0.5,
+          y: canvasConfig.height * 0.5
+        },
+        configs[ missionData.playerShip.type ],
+        missionData.playerShip.settings
+      )
+    );
+
+    mission.otherShips = missionData.ships.map( ( ship ) => {
+      return new Ship(
+        canvasConfig,
+        Object.assign(
+          {},
+          configs[ ship.type ],
+          ship.settings
+        )
+      );
+    });
+
+    this.gameClock = Game.Clock( missionData.timeLeft );
+    this.gameClock.start();
+    // add actions to keyboard events
+    KeyboardControls.bind( this.gameClock, this.getKeyboardActions() );
+
+    this.gameClock.addAction( ( delta ) => {
+      this.updateGame( delta, mission );
+    });
   }
 
   // react core methods
@@ -181,84 +272,9 @@ export default class MissionComponent extends React.Component {
   }
 
   componentDidMount () {
-
-    const missionSettings = {
-      playerShip: {
-        type: 'harrisonShip',
-        settings: {
-          x: canvasConfig.width * 0.5,
-          y: canvasConfig.height * 0.5,
-          _ready: true
-        }
-      },
-      initial: {
-        ships: [
-          {
-            type: 'alienClass1',
-            settings: {
-              x: 200,
-              y: 300,
-              speed: 40,
-              direction: 135,
-              _ready: true
-            }
-          },
-          {
-            type: 'alienClass2',
-            settings: {
-              x: 500,
-              y: 200,
-              speed: 400,
-              direction: 20,
-              _ready: true
-            }
-          }
-        ]
-      }
-    };
-
-    const canvasConfig = {
-      width: document.body.clientWidth,
-      height: document.body.clientHeight
-    };
-
-    const mission = {};
-
-    this.setState({
-      canvas: canvasConfig
-    });
-
-    this.gameClock = Game.Clock();
-
-    const shipConfig = configs.harrisonShip;
-
-    this.playerShip = new Ship(
-      canvasConfig,
-      Object.assign(
-        {},
-        configs[ missionSettings.playerShip.type ],
-        missionSettings.playerShip.settings
-      )
-    );
-
-    mission.otherShips = missionSettings.initial.ships.map( ( ship ) => {
-      return new Ship(
-        canvasConfig,
-        Object.assign(
-          {},
-          configs[ ship.type ],
-          ship.settings
-        )
-      );
-    });
-
-    this.gameClock.start();
-    // add actions to keyboard events
-    KeyboardControls.bind( this.gameClock, this.getKeyboardActions() );
-
-    this.gameClock.addAction( ( delta ) => {
-      this.updateGame( delta, mission );
-    });
+    if (this.props.missionData) {
+      this.loadMission( this.props.missionData );
+    }
   }
 
   render () {
