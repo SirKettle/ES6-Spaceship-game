@@ -5,16 +5,22 @@ import MissionComponent from './components/Mission/Mission.jsx';
 import CreditsComponent from './components/Credits/Credits.jsx';
 
 export default [
-    {
-        path: '/',
-        component: LandingComponent
-    },
-    {
-        path: 'mission',
+  {
+    path: '/',
+    component: LandingComponent
+  },
+  {
+    path: 'mission',
+    component: MissionComponent,
+    childRoutes: [
+      {
+        path: '/?id',
         component: MissionComponent
-    },
-    {
-        path: 'credits',
-        component: CreditsComponent
-    }
+      }
+    ]
+  },
+  {
+    path: 'credits',
+    component: CreditsComponent
+  }
 ];

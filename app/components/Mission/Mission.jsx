@@ -6,6 +6,7 @@ import Ship from '../../class/Ship';
 import GameComponent from '../Game/Game';
 import KeyboardControls from '../../services/KeyboardControls';
 import KeyboardActions from '../../services/KeyboardActions';
+import MissionService from '../../services/Mission';
 import Game from '../../services/Game';
 import gameUtils from '../../util/game';
 
@@ -38,46 +39,6 @@ Object.keys( configs ).forEach( ( key ) => {
 });
 
 export default class MissionComponent extends React.Component {
-
-  static propTypes = {
-    missionData: React.PropTypes.shape({
-      playerShip: React.PropTypes.object,
-      ships: React.PropTypes.arrayOf(React.PropTypes.object)
-    })
-  }
-
-  static defaultProps = {
-    missionData: {
-      playerShip: {
-        type: 'harrisonShip',
-        settings: {
-          _ready: true
-        }
-      },
-      ships: [
-        {
-          type: 'alienClass1',
-          settings: {
-            x: 200,
-            y: 300,
-            speed: 40,
-            direction: 135,
-            _ready: true
-          }
-        },
-        {
-          type: 'alienClass2',
-          settings: {
-            x: 500,
-            y: 200,
-            speed: 400,
-            direction: 20,
-            _ready: true
-          }
-        }
-      ]
-    }
-  }
 
   state = {
     canvas: {},
@@ -198,7 +159,7 @@ export default class MissionComponent extends React.Component {
   }
 
   onCanvasClicked ( event ) {
-      console.log( event );
+    console.log( event );
   }
 
   reset () {
@@ -206,14 +167,16 @@ export default class MissionComponent extends React.Component {
   }
 
   save () {
-    
+
   }
 
   // missionData could be the initial config or an
   // extended saved game
-  loadMission ( missionData ) {
+  loadMission ( id ) {
 
     this.reset();
+    const missionData = MissionService.getMission( id );
+    if ( !missionData ) { return; }
 
     const mission = {};
     const canvasConfig = {
@@ -272,12 +235,16 @@ export default class MissionComponent extends React.Component {
   }
 
   componentDidMount () {
-    if (this.props.missionData) {
-      this.loadMission( this.props.missionData );
+
+    const missionId = this.props.location.query.id;
+    if ( missionId ) {
+      this.loadMission( missionId );
     }
   }
 
   render () {
+
+    return null;
 
     return (
       <div className={ styles.Mission }>

@@ -1,5 +1,5 @@
 
-import gameUtils from '../util/game';
+import gameUtils from './game';
 
 const canvasUtils = {
 

@@ -122,6 +122,8 @@ export default class GameComponent extends React.Component {
     const gameCanvasStyles = {
     };
 
+    return null;
+
     return (
       <div className={ styles.Game }
         style={ inlineStyles }

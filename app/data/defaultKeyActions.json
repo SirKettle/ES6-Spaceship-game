@@ -10,6 +10,7 @@
   },
   "onceOnly": {
     "pause": [ 80, 27 ],
+    "save": [ 83 ],
     "roll": [ 82 ],
     "guides": [ 71 ],
     "map": [ 77 ]

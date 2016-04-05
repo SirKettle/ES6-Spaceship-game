@@ -3,6 +3,7 @@ import styles from './_Landing.scss';
 import React from 'react';
 import { Link } from 'react-router';
 import Footer from '../Footer/Footer.jsx';
+import MissionService from '../../services/Mission';
 
 export default class LandingComponent extends React.Component {
 
@@ -13,12 +14,29 @@ export default class LandingComponent extends React.Component {
   componentDidMount () {
   }
 
+  renderMissionLinks () {
+    const allMissionKeys = MissionService.getMissionKeys();
+    return allMissionKeys.map( ( key ) => {
+      return (
+        <Link key={ key.key } to={ `/mission/?id=${ key.key }` }>{ key.displayKey }</Link>
+      );
+    })
+  }
+
   render () {
+
+    // need to start using a service here to get missions....
+    const missionId = 'Default';
+
+    const missionParams = {
+      id: missionId
+    };
 
     return (
       <div className={ styles.Credits }>
         Landing page here...
-        <Link to="/mission">Start mission</Link>
+        <h2>Missions</h2>
+        { this.renderMissionLinks() }
         <Footer />
       </div>
     );

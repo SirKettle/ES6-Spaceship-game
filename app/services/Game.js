@@ -12,10 +12,6 @@ class GameClock {
         this.lastTimeRun = Date.now();
     };
 
-    static getKey( sdf ) {
-        // Canvas drawing code
-    };
-
     // public functions
     run () {
       const newTime = Date.now();
