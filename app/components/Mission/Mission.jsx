@@ -58,9 +58,11 @@ export default class MissionComponent extends React.Component {
 
   playerShip = null
 
+  mission = null
+
   gameClock = null
 
-  updateGame ( delta, mission ) {
+  updateGame ( delta ) {
 
     const allShots = this.playerShip.state.shots; // .concat(blah.shots..)
 
@@ -69,7 +71,7 @@ export default class MissionComponent extends React.Component {
     this.playerShip.update( delta );
 
     // update the other ships
-    mission.otherShips.forEach( ( thing ) => {
+    this.mission.otherShips.forEach( ( thing ) => {
       thing.update( delta );
     });
 
@@ -80,7 +82,7 @@ export default class MissionComponent extends React.Component {
 
     /* **** COLLISION DETECTION **** */
     // handle collisions between ships and ships
-    mission.otherShips.forEach( ( thing ) => {
+    this.mission.otherShips.forEach( ( thing ) => {
       gameUtils.handleCollision( thing, this.playerShip );
     });
 
@@ -88,27 +90,27 @@ export default class MissionComponent extends React.Component {
     allShots.forEach( ( shot ) => {
       // TODO: how to handle shots fired by firer - currently destroys self!
       // this.handleCollision( shot, this.playerShip );
-      mission.otherShips.forEach( ( thing ) => {
+      this.mission.otherShips.forEach( ( thing ) => {
         gameUtils.handleCollision( thing, shot );
       });
     });
 
     // TODO: paint collisions
     // filter out dead ships after collisions
-    mission.otherShips = mission.otherShips.filter( ( ship ) => {
+    this.mission.otherShips = this.mission.otherShips.filter( ( ship ) => {
       return ship.alive;
     });
 
     /* **** UPDATE THE GAME'S STATE **** */
     this.setState({
       hero: this.playerShip.state,
-      enemies: mission.otherShips.map( ( ship ) => ship.state ),
+      enemies: this.mission.otherShips.map( ( ship ) => ship.state ),
       shots: allShots.map( ( shot ) => shot.state ),
-      map: this.getMapState( mission )
+      map: this.getMapState()
     });
   }
 
-  getMapState ( mission ) {
+  getMapState () {
 
     const mapScale = 20;
     const mapSize = 0.25;
@@ -121,7 +123,7 @@ export default class MissionComponent extends React.Component {
     let otherShipsCoords = [];
 
     if ( this.state.showMap ) {
-      otherShipsCoords = mission.otherShips.map( ( ship ) => {
+      otherShipsCoords = this.mission.otherShips.map( ( ship ) => {
         return {
           x: Math.floor( gameUtils.getXPositionOffset( ship.state, this.playerShip.state, mapCanvas ) * scaleFactor ),
           y: Math.floor( gameUtils.getYPositionOffset( ship.state, this.playerShip.state, mapCanvas ) * scaleFactor )
@@ -140,17 +142,19 @@ export default class MissionComponent extends React.Component {
   getKeyboardActions () {
 
     const gameActions = {
-       pause: () => {
+      pause: () => {
         console.log('pause toggle');
         this.gameClock.toggle();
       },
-      roll: () => {
-        console.log('roll - ' + gameUtils.rollDice());
+      save: () => {
+        console.log('try save now');
       },
       guides: () => {
+        if (! this.gameClock.isRunning ) { return; }
         this.setState({ showGuides: !this.state.showGuides }); // toggle guides
       },
       map: () => {
+        if (! this.gameClock.isRunning ) { return; }
         this.setState({ showMap: !this.state.showMap }); // toggle map
       }
     };
@@ -158,16 +162,37 @@ export default class MissionComponent extends React.Component {
     return KeyboardActions.getActions( this.playerShip, gameActions );
   }
 
-  onCanvasClicked ( event ) {
-    console.log( event );
-  }
-
   reset () {
 
   }
 
-  save () {
+  save ( name ) {
 
+    const stripImages = ( state ) => {
+      const copy = Object.assign({}, state);
+      delete copy.images;
+      return copy;
+    };
+
+    MissionService.saveMission( name, {
+      playerShip: stripImages( this.playerShip.state ),
+      ships: this.mission.otherShips.map( ( ship ) => {
+        return stripImages( ship.state );
+      })
+    })
+  }
+
+  onSaveClicked ( event ) {
+
+    const { inputSaveMission } = this.refs;
+    console.log( event, inputSaveMission && inputSaveMission.value );
+    if ( inputSaveMission && inputSaveMission.value ) {
+      this.save( inputSaveMission.value );
+    }
+  }
+
+  onCanvasClicked ( event ) {
+    console.log( event );
   }
 
   // missionData could be the initial config or an
@@ -178,7 +203,7 @@ export default class MissionComponent extends React.Component {
     const missionData = MissionService.getMission( id );
     if ( !missionData ) { return; }
 
-    const mission = {};
+    this.mission = {};
     const canvasConfig = {
       width: document.body.clientWidth,
       height: document.body.clientHeight
@@ -196,17 +221,17 @@ export default class MissionComponent extends React.Component {
           y: canvasConfig.height * 0.5
         },
         configs[ missionData.playerShip.type ],
-        missionData.playerShip.settings
+        missionData.playerShip
       )
     );
 
-    mission.otherShips = missionData.ships.map( ( ship ) => {
+    this.mission.otherShips = missionData.ships.map( ( ship ) => {
       return new Ship(
         canvasConfig,
         Object.assign(
           {},
           configs[ ship.type ],
-          ship.settings
+          ship
         )
       );
     });
@@ -217,7 +242,7 @@ export default class MissionComponent extends React.Component {
     KeyboardControls.bind( this.gameClock, this.getKeyboardActions() );
 
     this.gameClock.addAction( ( delta ) => {
-      this.updateGame( delta, mission );
+      this.updateGame( delta );
     });
   }
 
@@ -242,12 +267,25 @@ export default class MissionComponent extends React.Component {
     }
   }
 
-  render () {
+  renderPauseScreen () {
+    if ( this.gameClock && !this.gameClock.isRunning ) {
+      return (
+        <div className={ styles.Pause }>
+          <h2>Mission paused</h2>
+          <input ref="inputSaveMission" type="text" />
+          <button onClick={ this.onSaveClicked.bind(this) }>Save mission</button>
+        </div>
+      );
+    }
 
     return null;
+  }
+
+  render () {
 
     return (
       <div className={ styles.Mission }>
+        { this.renderPauseScreen() }
         <GameComponent
           hero={ this.state.hero }
           enemies={ this.state.enemies }

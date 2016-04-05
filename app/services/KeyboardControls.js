@@ -20,7 +20,9 @@ const bind = ( GameClock, keyActions ) => {
           return;
         }
 
-        event.preventDefault();
+        if ( keyAction.preventDefault ) {
+          event.preventDefault();
+        }
 
         if ( keyAction.onceOnly ) {
           GameClock.addAction( keyAction.action, keyAction.onceOnly, keyAction.alwaysRun );

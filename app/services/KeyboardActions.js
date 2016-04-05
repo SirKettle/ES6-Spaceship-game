@@ -35,10 +35,12 @@ const KeyboardActions = {
 
     const assignKeyCodeActions = ( keyCodes, actionKey, onceOnly = false, alwaysRun = false ) => {
       keyCodes.forEach( ( keyCode ) => {
+        const preventDefault = defaultKeyActions.preventDefault.indexOf( keyCode ) !== -1;
         keyCodeActionMap[ objectUtils.getSafeKey( keyCode ) ] = {
           onceOnly: onceOnly,
           action: actions[ actionKey ],
-          alwaysRun: alwaysRun
+          alwaysRun: alwaysRun,
+          preventDefault: preventDefault
         };
       });
     }
@@ -46,7 +48,7 @@ const KeyboardActions = {
     // assign the repeating key actions - ie left, fire...
     Object.keys( defaultKeyActions.repeating ).forEach( ( actionKey ) => {
       const keyCodes = defaultKeyActions.repeating[ actionKey ];
-      assignKeyCodeActions( keyCodes, actionKey );
+      assignKeyCodeActions( keyCodes, actionKey, false, false );
     });
 
     // assign the once only key actions - ie pause, guides...

@@ -1,5 +1,5 @@
 {
-  "type": "hero",
+  "type": "playerShip",
   "name": "Harrison Ship Class I",
   "health": 1,
   "power": 1,

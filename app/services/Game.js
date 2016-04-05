@@ -4,8 +4,8 @@ import objectUtils from '../util/object';
 class GameClock {
 
     constructor ( delta = 20 ) {
+        this._isRunning = false;
         this.delta = delta;
-        this.isRunning = false;
         this.actions = {};
         this.actionCount = 0;
         this.intervalId = null;
@@ -39,14 +39,14 @@ class GameClock {
     start () {
       // this.intervalId = window.setInterval( () => {
       // }, this.delta );
-      this.isRunning = true;
+      this._isRunning = true;
       this.lastTimeRun = Date.now();
       this.run();
     }
 
     pause () {
       // window.clearInterval(this.intervalId);
-      this.isRunning = false;
+      this._isRunning = false;
     }
 
     stop () {
@@ -83,6 +83,10 @@ class GameClock {
 
     get delta () {
       return this._delta;
+    }
+
+    get isRunning () {
+      return Boolean( this._isRunning );
     }
 }
 

@@ -18,7 +18,9 @@ export default class LandingComponent extends React.Component {
     const allMissionKeys = MissionService.getMissionKeys();
     return allMissionKeys.map( ( key ) => {
       return (
-        <Link key={ key.key } to={ `/mission/?id=${ key.key }` }>{ key.displayKey }</Link>
+        <p key={ `para${ key }` }>
+          <Link key={ `link${ key }` } to={ `/mission/?id=${ key }` }>{ key }</Link>
+        </p>
       );
     })
   }

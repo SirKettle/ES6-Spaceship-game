@@ -8,24 +8,20 @@ const defaultMissionData = {
   },
   ships: [
     {
+      _ready: true,
       type: 'alienClass1',
-      settings: {
-        x: 200,
-        y: 300,
-        speed: 40,
-        direction: 135,
-        _ready: true
-      }
+      x: 200,
+      y: 300,
+      speed: 40,
+      direction: 135
     },
     {
+      _ready: true,
       type: 'alienClass2',
-      settings: {
-        x: 500,
-        y: 200,
-        speed: 400,
-        direction: 20,
-        _ready: true
-      }
+      x: 500,
+      y: 200,
+      speed: 400,
+      direction: 20
     }
   ]
 };
@@ -58,10 +54,7 @@ class MissionService {
 
   getMissionKeys () {
     return Store.getKeys( this.storeKey ).map( ( key ) => {
-      return {
-        key: key,
-        displayKey: this.getDisplayKey( key )
-      }
+      return this.getDisplayKey( key );
     });
   }
 

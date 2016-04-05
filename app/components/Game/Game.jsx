@@ -119,11 +119,6 @@ export default class GameComponent extends React.Component {
       height: canvas.height
     };
 
-    const gameCanvasStyles = {
-    };
-
-    return null;
-
     return (
       <div className={ styles.Game }
         style={ inlineStyles }
@@ -133,7 +128,6 @@ export default class GameComponent extends React.Component {
           width={ canvas.width }
           height={ canvas.height }
           onClick={ onCanvasClicked }
-          style={ gameCanvasStyles }
         />
 
         <canvas ref="mapCanvas"

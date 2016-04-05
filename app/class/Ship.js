@@ -24,6 +24,7 @@ class Ship extends Actor {
       y: 0,
       direction: 0,
       images: [],
+      imageUrls: [],
       shotHealth: 1,
       shotPower: 0.1,
       shotSpeed: 900,
@@ -32,6 +33,9 @@ class Ship extends Actor {
     };
 
     super( canvas, props, defaultProps );
+
+    // loading shots needs some more thought
+    this._state.shots = [];
   }
 
   accelerate ( delta, faster = true ) {
