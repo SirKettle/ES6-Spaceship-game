@@ -10,7 +10,7 @@ class Ship extends Actor {
     const defaultProps = {
       _ready: true,
       _class: 'Ship',
-      type: 'enemy',
+      type: 'shipType',
       name: 'Alien Saucer Class I',
       health: 1,
       power: 1,
@@ -24,8 +24,6 @@ class Ship extends Actor {
       x: 0,
       y: 0,
       direction: 0,
-      images: [],
-      imageUrls: [],
       shotHealth: 1,
       shotPower: 0.1,
       shotSpeed: 900,
@@ -99,12 +97,7 @@ class Ship extends Actor {
   }
 
   update ( delta ) {
-    const { x, y, direction, speed } = this.state;
-    // get new coords
-    const heroPos = this.getPosition( delta, x, y, direction, speed );
-    // update the state
-    this._state.x = heroPos.x;
-    this._state.y = heroPos.y;
+    super.update( delta );
 
     this._state.shots = this.state.shots.filter( ( shotInstance ) => {
       const shot = shotInstance.state;
@@ -113,9 +106,6 @@ class Ship extends Actor {
       }
       return true;
     });
-
-    this._state.image = this.image;
-    this._state.circle = this.circle;
   }
 
   get strafeSpeed () {

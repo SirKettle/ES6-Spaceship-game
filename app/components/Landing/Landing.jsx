@@ -7,6 +7,9 @@ import MissionService from '../../services/Mission';
 
 export default class LandingComponent extends React.Component {
 
+  state = {
+    missionKeys: MissionService.getKeys()
+  }
 
   componentWillUnmount () {
   }
@@ -14,25 +17,25 @@ export default class LandingComponent extends React.Component {
   componentDidMount () {
   }
 
+  deleteMissionClicked ( missionKey ) {
+    MissionService.remove( missionKey );
+    this.setState({
+      missionKeys: MissionService.getKeys()
+    });
+  }
+
   renderMissionLinks () {
-    const allMissionKeys = MissionService.getMissionKeys();
-    return allMissionKeys.map( ( key ) => {
+    return this.state.missionKeys.map( ( key ) => {
       return (
         <p key={ `para${ key }` }>
-          <Link key={ `link${ key }` } to={ `/mission/?id=${ key }` }>{ key }</Link>
+          <Link key={ `link${ key }` } to={ `/mission/?key=${ key }` }>{ key }</Link>
+          <button onClick={ this.deleteMissionClicked.bind( this, key ) }>remove</button>
         </p>
       );
     })
   }
 
   render () {
-
-    // need to start using a service here to get missions....
-    const missionId = 'Default';
-
-    const missionParams = {
-      id: missionId
-    };
 
     return (
       <div className={ styles.Credits }>

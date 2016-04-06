@@ -29,8 +29,8 @@ const defaultMissionData = {
       _ready: true,
       type: 'spaceStation',
       _class: 'SpaceStation',
-      x: 1500,
-      y: 1200,
+      x: 1,
+      y: 1,
       speed: 10,
       direction: 355
     }
@@ -50,7 +50,7 @@ class MissionService {
       missions: {}
     };
 
-    this.saveMission( 'Default', defaultMissionData );
+    this.save( 'Default', defaultMissionData );
   }
 
   static getInstance () {
@@ -63,18 +63,21 @@ class MissionService {
     return MissionService.instance;
   }
 
-  getMissionKeys () {
+  getKeys () {
     return Store.getKeys( this.storeKey ).map( ( key ) => {
       return this.getDisplayKey( key );
     });
   }
 
+  remove ( key ) {
+    Store.remove( this.getStoreKey( key ) );
+  }
 
-  getMission ( key ) {
+  load ( key ) {
     return Store.get( this.getStoreKey( key ) );
   }
 
-  saveMission ( key, missionData ) {
+  save ( key, missionData ) {
     Store.set(
       this.getStoreKey( key ),
       Object.assign( { missionKey: key }, missionData )

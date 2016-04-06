@@ -8,6 +8,10 @@ const Store = {
       });
   },
 
+  remove: ( key ) => {
+    window.localStorage.removeItem( key );
+  },
+
   get: ( key ) => {
     const dataString = window.localStorage.getItem( key );
     if ( !dataString ) {

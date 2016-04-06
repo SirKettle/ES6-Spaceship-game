@@ -48,7 +48,7 @@ export default class MissionComponent extends React.Component {
     canvas: {},
     running: true,
     hero: {},
-    enemies: [],
+    actors: [],
     shots: [],
     showGuides: true,
     showMap: true,
@@ -108,7 +108,7 @@ export default class MissionComponent extends React.Component {
     /* **** UPDATE THE GAME'S STATE **** */
     this.setState({
       hero: this.playerShip.state,
-      enemies: this.mission.actors.map( ( actor ) => actor.state ),
+      actors: this.mission.actors.map( ( actor ) => actor.state ),
       shots: allShots.map( ( shot ) => shot.state ),
       map: this.getMapState()
     });
@@ -178,7 +178,7 @@ export default class MissionComponent extends React.Component {
       return copy;
     };
 
-    MissionService.saveMission( name, {
+    MissionService.save( name, {
       playerShip: stripImages( this.playerShip.state ),
       actors: this.mission.actors.map( ( actor ) => {
         return stripImages( actor.state );
@@ -201,10 +201,10 @@ export default class MissionComponent extends React.Component {
 
   // missionData could be the initial config or an
   // extended saved game
-  loadMission ( id ) {
+  loadMission ( missionKey ) {
 
     this.reset();
-    const missionData = MissionService.getMission( id );
+    const missionData = MissionService.load( missionKey );
     if ( !missionData ) { return; }
 
     this.mission = {};
@@ -288,9 +288,9 @@ export default class MissionComponent extends React.Component {
 
   componentDidMount () {
 
-    const missionId = this.props.location.query.id;
-    if ( missionId ) {
-      this.loadMission( missionId );
+    const missionKey = this.props.location.query.key;
+    if ( missionKey ) {
+      this.loadMission( missionKey );
     }
   }
 
@@ -315,7 +315,7 @@ export default class MissionComponent extends React.Component {
         { this.renderPauseScreen() }
         <GameComponent
           hero={ this.state.hero }
-          enemies={ this.state.enemies }
+          actors={ this.state.actors }
           shots={ this.state.shots }
           score={ this.state.score }
           map={ this.state.map }

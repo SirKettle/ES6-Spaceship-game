@@ -14,7 +14,7 @@ export default [
     component: MissionComponent,
     childRoutes: [
       {
-        path: '/?id',
+        path: '/?key',
         component: MissionComponent
       }
     ]

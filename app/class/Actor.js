@@ -4,7 +4,21 @@ class Actor {
 
   constructor ( canvas, props, defaultProps = {} ) {
     this._canvas = canvas;
-    this._state = Object.assign({}, defaultProps, props);
+    this._state = Object.assign({
+      _ready: true,
+      _class: 'Actor',
+      type: '_actor',
+      name: 'base object',
+      health: 1,
+      power: 1,
+      size: 1,
+      speed: 0,
+      x: 0,
+      y: 0,
+      direction: 0,
+      images: [],
+      imageUrls: []
+    }, defaultProps, props);
     this._state.circle = this.circle;
   }
 
@@ -35,6 +49,19 @@ class Actor {
 
   hit ( anotherActor ) {
     this._state.health -= anotherActor.power;
+  }
+
+  update ( delta ) {
+    const { x, y, direction, speed } = this._state;
+    // get new coords
+    const pos = this.getPosition( delta, x, y, direction, speed );
+    // update the state
+    this._state.x = pos.x;
+    this._state.y = pos.y;
+    // update the image
+    this._state.image = this.image;
+    // update the circle
+    this._state.circle = this.circle;
   }
 
   get circle () {

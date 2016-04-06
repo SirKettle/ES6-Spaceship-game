@@ -83,7 +83,10 @@ const canvasUtils = {
 
   drawThing: ( ctx, thing, x, y, showGuides = true ) => {
     const { image, circle, direction } = thing;
-    if ( !image ) { return; }
+    if ( !image ) {
+      console.warn( 'image not found', thing );
+      return;
+    }
     const guidesColor = 'rgba( 0, 255, 130, 0.5 )';
     const crosshairOffset = 25;
     const radians = gameUtils.degreesToRadians( direction );

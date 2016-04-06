@@ -3,7 +3,8 @@ import React from 'react';
 import canvasUtils from '../../util/canvas';
 import gameUtils from '../../util/game';
 
-require("file?!../../assets/space_bg.jpg");
+// TODO: can we use import here instead?
+require('file?!../../assets/space_bg.jpg');
 
 export default class GameComponent extends React.Component {
 
@@ -19,7 +20,7 @@ export default class GameComponent extends React.Component {
       ships: React.PropTypes.arrayOf(React.PropTypes.object)
     }).isRequired,
     hero: React.PropTypes.object,
-    enemies: React.PropTypes.arrayOf(React.PropTypes.object),
+    actors: React.PropTypes.arrayOf(React.PropTypes.object),
     shots: React.PropTypes.arrayOf(React.PropTypes.object),
     score: React.PropTypes.object,
     showGuides: React.PropTypes.bool,
@@ -32,7 +33,7 @@ export default class GameComponent extends React.Component {
   canvases = {}
 
   renderGameCanvas = ( ctx ) => {
-    const { canvas, map, hero, enemies, shots, showGuides, showMap } = this.props;
+    const { canvas, map, hero, actors, shots, showGuides, showMap } = this.props;
 
     const getXPositionOffset = ( thing, offsetThing ) => {
       return gameUtils.getXPositionOffset( thing, offsetThing, canvas );
@@ -52,9 +53,9 @@ export default class GameComponent extends React.Component {
       canvasUtils.drawShot( canvas, ctx, getXPositionOffset( shot, hero ), getYPositionOffset( shot, hero ), shot.direction, shot.size, shot.health );
     });
 
-    // Draw the enemy ships
-    enemies.forEach( ( enemy ) => {
-      canvasUtils.drawThing( ctx, enemy, getXPositionOffset( enemy, hero ), getYPositionOffset( enemy, hero ), showGuides );
+    // Draw the other actors (ie enemy ships, space stations etc)
+    actors.forEach( ( actor ) => {
+      canvasUtils.drawThing( ctx, enemy, getXPositionOffset( actor, hero ), getYPositionOffset( actor, hero ), showGuides );
     });
 
     // Draw our moving grid line guides
@@ -80,9 +81,18 @@ export default class GameComponent extends React.Component {
     }
   }
 
+  renderSceneryCanvas = ( ctx) => {
+    // this is where we will give the impression of motion
+    // without needing the guides
+    // ie,
+    // 1st layer - dust clouds, junk etc - moving at same speed
+    // 2nd layer - middle distance - moons, planets, stars etc - moving at 1/3 speed
+  }
+
   renderScene ( canvases ) {
     this.renderGameCanvas( this.contexts.game );
     this.renderMapCanvas( this.contexts.map );
+    this.renderSceneryCanvas( this.contexts.scenery );
   }
 
   paintScore ( ctx ) {
@@ -96,6 +106,7 @@ export default class GameComponent extends React.Component {
     this.canvases = {
       game: this.refs.gameCanvas,
       map: this.refs.mapCanvas
+      scenery: this.refs.sceneryCanvas
     };
 
     Object.keys( this.canvases ).forEach( ( canvasKey ) => {
@@ -132,6 +143,12 @@ export default class GameComponent extends React.Component {
 
         <canvas ref="mapCanvas"
           className={ styles.CanvasMap }
+          width={ map.width }
+          height={ map.height }
+        />
+
+        <canvas ref="sceneryCanvas"
+          className={ styles.CanvasScenery }
           width={ map.width }
           height={ map.height }
         />
