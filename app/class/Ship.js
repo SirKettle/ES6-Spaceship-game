@@ -9,6 +9,7 @@ class Ship extends Actor {
 
     const defaultProps = {
       _ready: true,
+      _class: 'Ship',
       type: 'enemy',
       name: 'Alien Saucer Class I',
       health: 1,

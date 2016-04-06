@@ -1,7 +1,5 @@
 
-import Actor from './Actor';
-import Shot from './Shot';
-import gameUtils from '../util/game';
+import DumbObject from './DumbObject';
 
 class SpaceStation extends DumbObject {
 
@@ -9,6 +7,7 @@ class SpaceStation extends DumbObject {
 
     const defaultProps = {
       _ready: true,
+      _class: 'SpaceStation',
       type: 'station',
       name: 'Space Station',
       health: 100000,
@@ -16,7 +15,9 @@ class SpaceStation extends DumbObject {
       size: 300,
       speed: 0,
       x: 0,
-      y: 0
+      y: 0,
+      images: [],
+      imageUrls: []
     };
 
     super( canvas, props, defaultProps );
@@ -24,34 +25,3 @@ class SpaceStation extends DumbObject {
 }
 
 export default SpaceStation;
-
-class DumbObject extends Actor {
-
-  constructor ( canvas, props ) {
-
-    const defaultProps = {
-      _ready: true,
-      type: '_dumb',
-      name: 'Dumb object',
-      health: 1,
-      power: 1,
-      size: 100,
-      speed: 0,
-      x: 0,
-      y: 0
-    };
-
-    super( canvas, props, defaultProps );
-  }
-
-  update ( delta ) {
-    const { x, y, direction, speed } = this._state;
-    // get new coords
-    const pos = this.getPosition( delta, x, y, direction, speed );
-    // update the state
-    this._state.x = pos.x;
-    this._state.y = pos.y;
-  }
-}
-
-export default DumbObject;

@@ -6,10 +6,11 @@ const defaultMissionData = {
       _ready: true
     }
   },
-  ships: [
+  actors: [
     {
       _ready: true,
       type: 'alienClass1',
+      _class: 'Ship',
       x: 200,
       y: 300,
       speed: 40,
@@ -18,10 +19,20 @@ const defaultMissionData = {
     {
       _ready: true,
       type: 'alienClass2',
+      _class: 'Ship',
       x: 500,
       y: 200,
       speed: 400,
       direction: 20
+    },
+    {
+      _ready: true,
+      type: 'spaceStation',
+      _class: 'SpaceStation',
+      x: 1500,
+      y: 1200,
+      speed: 10,
+      direction: 355
     }
   ]
 };

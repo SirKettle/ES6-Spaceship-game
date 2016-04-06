@@ -2,6 +2,8 @@ import styles from './_Mission.scss';
 
 import React from 'react';
 import Footer from '../Footer/Footer';
+import DumbObject from '../../class/DumbObject';
+import SpaceStation from '../../class/SpaceStation';
 import Ship from '../../class/Ship';
 import GameComponent from '../Game/Game';
 import KeyboardControls from '../../services/KeyboardControls';
@@ -14,12 +16,14 @@ import playerShipData from '../../data/playerShip.json';
 import harrisonShipData from '../../data/harrisonShip.json';
 import alienClass1Data from '../../data/alienClass1.json';
 import alienClass2Data from '../../data/alienClass2.json';
+import spaceStationData from '../../data/spaceStation.json';
 
 const configs = {
   playerShip: Object.assign({}, playerShipData),
   harrisonShip: Object.assign({}, harrisonShipData),
   alienClass1: Object.assign({}, alienClass1Data),
-  alienClass2: Object.assign({}, alienClass2Data)
+  alienClass2: Object.assign({}, alienClass2Data),
+  spaceStation: Object.assign({}, spaceStationData)
 };
 
 const injectImages = ( config ) => {
@@ -71,7 +75,7 @@ export default class MissionComponent extends React.Component {
     this.playerShip.update( delta );
 
     // update the other ships
-    this.mission.otherShips.forEach( ( thing ) => {
+    this.mission.actors.forEach( ( thing ) => {
       thing.update( delta );
     });
 
@@ -82,7 +86,7 @@ export default class MissionComponent extends React.Component {
 
     /* **** COLLISION DETECTION **** */
     // handle collisions between ships and ships
-    this.mission.otherShips.forEach( ( thing ) => {
+    this.mission.actors.forEach( ( thing ) => {
       gameUtils.handleCollision( thing, this.playerShip );
     });
 
@@ -90,21 +94,21 @@ export default class MissionComponent extends React.Component {
     allShots.forEach( ( shot ) => {
       // TODO: how to handle shots fired by firer - currently destroys self!
       // this.handleCollision( shot, this.playerShip );
-      this.mission.otherShips.forEach( ( thing ) => {
+      this.mission.actors.forEach( ( thing ) => {
         gameUtils.handleCollision( thing, shot );
       });
     });
 
     // TODO: paint collisions
     // filter out dead ships after collisions
-    this.mission.otherShips = this.mission.otherShips.filter( ( ship ) => {
-      return ship.alive;
+    this.mission.actors = this.mission.actors.filter( ( actor ) => {
+      return actor.alive;
     });
 
     /* **** UPDATE THE GAME'S STATE **** */
     this.setState({
       hero: this.playerShip.state,
-      enemies: this.mission.otherShips.map( ( ship ) => ship.state ),
+      enemies: this.mission.actors.map( ( actor ) => actor.state ),
       shots: allShots.map( ( shot ) => shot.state ),
       map: this.getMapState()
     });
@@ -123,10 +127,10 @@ export default class MissionComponent extends React.Component {
     let otherShipsCoords = [];
 
     if ( this.state.showMap ) {
-      otherShipsCoords = this.mission.otherShips.map( ( ship ) => {
+      otherShipsCoords = this.mission.actors.map( ( actor ) => {
         return {
-          x: Math.floor( gameUtils.getXPositionOffset( ship.state, this.playerShip.state, mapCanvas ) * scaleFactor ),
-          y: Math.floor( gameUtils.getYPositionOffset( ship.state, this.playerShip.state, mapCanvas ) * scaleFactor )
+          x: Math.floor( gameUtils.getXPositionOffset( actor.state, this.playerShip.state, mapCanvas ) * scaleFactor ),
+          y: Math.floor( gameUtils.getYPositionOffset( actor.state, this.playerShip.state, mapCanvas ) * scaleFactor )
         }
       });
     }
@@ -176,8 +180,8 @@ export default class MissionComponent extends React.Component {
 
     MissionService.saveMission( name, {
       playerShip: stripImages( this.playerShip.state ),
-      ships: this.mission.otherShips.map( ( ship ) => {
-        return stripImages( ship.state );
+      actors: this.mission.actors.map( ( actor ) => {
+        return stripImages( actor.state );
       })
     })
   }
@@ -225,16 +229,39 @@ export default class MissionComponent extends React.Component {
       )
     );
 
-    this.mission.otherShips = missionData.ships.map( ( ship ) => {
-      return new Ship(
+    const getClass = ( classKey ) => {
+      const classMap = {
+        'Ship': Ship,
+        'SpaceStation': SpaceStation,
+        'DumbObject': DumbObject
+      };
+
+      return classMap[ classKey ];
+    };
+
+
+    this.mission.actors = missionData.actors.map( ( thing ) => {
+      const ClassType = getClass( thing._class );
+      return new ClassType(
         canvasConfig,
         Object.assign(
           {},
-          configs[ ship.type ],
-          ship
+          configs[ thing.type ],
+          thing
         )
       );
     });
+
+    // this.mission.otherShips = missionData.ships.map( ( ship ) => {
+    //   return new Ship(
+    //     canvasConfig,
+    //     Object.assign(
+    //       {},
+    //       configs[ ship.type ],
+    //       ship
+    //     )
+    //   );
+    // });
 
     this.gameClock = Game.Clock( missionData.timeLeft );
     this.gameClock.start();

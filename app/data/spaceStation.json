@@ -1,0 +1,14 @@
+{
+  "type": "spaceStation",
+  "name": "HJT Space Station",
+  "health": 10000,
+  "power": -2,
+  "size": 300,
+  "speed": 0,
+  "x": 0,
+  "y": 0,
+  "imageUrls": [
+    "space_station_1.png"
+  ],
+  "images": []
+}
