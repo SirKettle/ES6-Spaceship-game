@@ -1,6 +1,23 @@
 
 const gameUtils = {
 
+  doProbably: ( probability, doIt ) => {
+    const oneIn = Math.floor( 1 / probability );
+    if (gameUtils.rollDice(oneIn) === 1) {
+      doIt();
+      return true;
+    }
+    return false;
+  },
+
+  // ie if you need to generate an enemy ship, on average,
+  // once per 20 seconds:
+  // => gameUtils.doProbablyPerSeconds( delta, 20, generateShip );
+  doProbablyPerSeconds: ( delta, seconds, doIt ) => {
+    const probability = ( 1 / seconds ) * ( delta / 1000 );
+    return gameUtils.doProbably( probability, doIt );
+  },
+
   rollDice: ( possValues = 6 ) => {
     return gameUtils.getRandomInt( 1, possValues );
   },
