@@ -21,7 +21,7 @@
   ],
   "images": [],
   "shotHealth": 2,
-  "shotPower": 0.02,
+  "shotPower": 0.4,
   "shotSpeed": 1200,
   "shotLifeSpan": 200
 }
