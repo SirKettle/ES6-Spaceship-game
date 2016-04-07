@@ -92,7 +92,19 @@ class Ship extends Actor {
   shoot () {
     const { direction, speed, shotSpeed, shotPower } = this.state;
     const { x, y } = this.circle;
-    const shot = new Shot( direction, x, y, speed + shotSpeed, shotPower, 2 );
+    const shot = new Shot( this._canvas, {
+      direction: direction,
+      speed: speed + shotSpeed,
+      power: shotPower,
+      health: 2,
+      x: x,
+      y: y
+    });
+
+    this._state.shots.push( shot );
+  }
+
+
     this._state.shots.push( shot );
   }
 
