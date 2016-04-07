@@ -19,6 +19,11 @@ class Shot extends Actor {
 
     super( canvas, props, defaultProps );
   }
+
+  update ( delta ) {
+    super.update( delta );
+    this._state.health -= delta / this._state.lifeSpan;
+  }
 }
 
 export default Shot;

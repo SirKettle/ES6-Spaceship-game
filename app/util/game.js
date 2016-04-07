@@ -58,6 +58,20 @@ const gameUtils = {
     const dy = Math.abs( circle1.y - circle2.y );
     const distance = Math.sqrt( dx * dx + dy * dy );
     return Boolean( distance < ( circle1.radius + circle2.radius ) );
+  },
+
+  getDirection: ( thing, target ) => {
+    if ( !target ) { return; };
+    const dx = thing.circle.x - target.circle.x;
+    const dy = thing.circle.y - target.circle.y;
+    const theta = Math.atan2(dy, dx);
+    let newDirection = gameUtils.radiansToDegrees( theta ) - 90;
+
+    if ( newDirection < 0 ) {
+      newDirection = 360 + newDirection;
+    }
+
+    return newDirection % 360;
   }
 }
 

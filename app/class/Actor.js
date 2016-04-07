@@ -20,6 +20,10 @@ class Actor {
       imageUrls: []
     }, defaultProps, props);
     this._state.circle = this.circle;
+
+    if ( !this.state.maxHealth ) {
+      this._state.maxHealth = this.state.health;
+    }
   }
 
   changeDirection ( turnBy ) {
@@ -49,6 +53,10 @@ class Actor {
 
   hit ( anotherActor, delta ) {
     this._state.health -= anotherActor.power * ( delta / 1000 );
+
+    if ( this.state.health > this.state.maxHealth ) {
+      this._state.health = this._state.maxHealth;
+    }
   }
 
   update ( delta ) {

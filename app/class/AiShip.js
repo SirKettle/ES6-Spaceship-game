@@ -16,13 +16,11 @@ class AiShip extends Ship {
     super( canvas, Object.assign( {}, defaultProps, props ) );
   }
 
-  update ( delta ) {
+  update ( delta, defaultTarget ) {
     super.update( delta );
 
-    const nearestTarget = {
-      x: 500,
-      y: 500
-    };
+    const { targets } = this.state;
+    const nearestTarget = defaultTarget;
 
 
     // Turn to face target
@@ -41,7 +39,9 @@ class AiShip extends Ship {
 
     // Shoot
     gameUtils.doProbablyPerSeconds( delta, 2, () => {
-      this.shoot();
+      const direction = gameUtils.getDirection( this.state, nearestTarget );
+      console.log(direction);
+      this.shoot( direction );
     });
 
   }

@@ -102,7 +102,7 @@ export default class MissionComponent extends React.Component {
 
     const addActor = ( data = {} ) => {
       const defaultParams = {
-        _class: 'Ship',
+        _class: 'AiShip',
         type: 'alienClass1',
         x: Math.floor(Math.random() * 4000 - 2000),
         y: Math.floor(Math.random() * 4000 - 2000),
@@ -140,7 +140,7 @@ export default class MissionComponent extends React.Component {
 
     // update the other ships
     this.mission.actors.forEach( ( thing ) => {
-      thing.update( delta );
+      thing.update( delta, this.playerShip.state );
     });
 
     // update the shots

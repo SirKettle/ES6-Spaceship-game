@@ -96,11 +96,16 @@ class Ship extends Actor {
     this._state.y = heroPos.y;
   }
 
-  shoot () {
+  shoot ( shotDirection ) {
     const { direction, speed, shotSpeed, shotPower } = this.state;
     const { x, y } = this.circle;
+
+    if ( typeof shotDirection === 'undefined' ) {
+      shotDirection = direction;
+    }
+    
     const shot = new Shot( this._canvas, {
-      direction: direction,
+      direction: shotDirection,
       speed: speed + shotSpeed,
       power: shotPower,
       health: 2,
