@@ -103,7 +103,7 @@ class Ship extends Actor {
     if ( typeof shotDirection === 'undefined' ) {
       shotDirection = direction;
     }
-    
+
     const shot = new Shot( this._canvas, {
       direction: shotDirection,
       speed: speed + shotSpeed,
@@ -143,6 +143,20 @@ class Ship extends Actor {
       }
       return true;
     });
+    // update the targetDirection
+    this._state.targetDirection = this.targetDirection;
+  }
+
+  get target () {
+    return this.state.target;
+  }
+
+  set target ( _target ) {
+    this._state.target = _target;
+  }
+
+  get targetDirection () {
+    return gameUtils.getDirection( this.state, this.target );
   }
 
   get strafeSpeed () {

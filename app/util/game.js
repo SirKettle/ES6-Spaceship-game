@@ -44,6 +44,12 @@ const gameUtils = {
     return thing.y - offsetThing.y + canvasCenter - offsetThing.size * 0.5;
   },
 
+  getDistance: ( circle1, circle2 ) => {
+    const dx = Math.abs( circle1.x - circle2.x );
+    const dy = Math.abs( circle1.y - circle2.y );
+    return Math.sqrt( dx * dx + dy * dy );
+  },
+
   handleCollision: ( thing1, thing2, delta ) => {
     const isCollision = gameUtils.getIsCollision( thing1.circle, thing2.circle );
 
@@ -54,9 +60,7 @@ const gameUtils = {
   },
 
   getIsCollision: ( circle1, circle2 ) => {
-    const dx = Math.abs( circle1.x - circle2.x );
-    const dy = Math.abs( circle1.y - circle2.y );
-    const distance = Math.sqrt( dx * dx + dy * dy );
+    const distance = gameUtils.getDistance( circle1, circle2 );
     return Boolean( distance < ( circle1.radius + circle2.radius ) );
   },
 
@@ -72,6 +76,16 @@ const gameUtils = {
     }
 
     return newDirection % 360;
+  },
+
+  getXPositionFromAngle: ( xStart, angleDegrees, distance ) => {
+    const radians = gameUtils.degreesToRadians( angleDegrees + 270 );
+    return xStart + Math.cos( radians ) * distance;
+  },
+
+  getYPositionFromAngle: ( yStart, angleDegrees, distance ) => {
+    const radians = gameUtils.degreesToRadians( angleDegrees + 270 );
+    return yStart + Math.sin( radians ) * distance;
   }
 }
 
