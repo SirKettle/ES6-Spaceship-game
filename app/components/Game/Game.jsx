@@ -49,6 +49,8 @@ export default class GameComponent extends React.Component {
 
     if ( !hero._ready ) { return };
 
+    // TODO: ONLY DRAW THINGS WHICH ARE VISIBLE IN THE CANVAS FRAME
+
     // Draw the shots
     shots.forEach( ( shot ) => {
       canvasUtils.drawShot( canvas, ctx, getXPositionOffset( shot, hero ), getYPositionOffset( shot, hero ), shot.direction, shot.size, shot.health );
@@ -154,7 +156,7 @@ export default class GameComponent extends React.Component {
           width={ map.width }
           height={ map.height }
         />
-        
+
         <canvas ref="gameCanvas"
           className={ styles.CanvasGame }
           width={ canvas.width }

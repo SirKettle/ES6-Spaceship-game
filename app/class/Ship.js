@@ -69,6 +69,13 @@ class Ship extends Actor {
     this._state.direction = newDirection;
   }
 
+  turnToward ( delta, target ) {
+  //   const directionOfTarget;
+  //   const turnBy = this.state.turnSpeed / delta;
+  //   const newDirection =  this.changeDirection( -turnBy );
+  //   this.turnLeft( delta )
+  }
+
   strafeLeft ( delta ) {
     const { x, y } = this.state;
     const newDirection =  this.changeDirection( -90 );

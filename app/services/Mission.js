@@ -6,7 +6,7 @@ const defaultMissionData = {
   },
   actors: [
     {
-      _class: 'Ship',
+      _class: 'AiShip',
       type: 'alienClass1',
       x: 200,
       y: 300,
@@ -14,7 +14,7 @@ const defaultMissionData = {
       direction: 135
     },
     {
-      _class: 'Ship',
+      _class: 'AiShip',
       type: 'alienClass2',
       x: 500,
       y: 200,
@@ -22,7 +22,7 @@ const defaultMissionData = {
       direction: 20
     },
     {
-      _class: 'Ship',
+      _class: 'AiShip',
       type: 'alienClass1',
       x: 200,
       y: 300,
@@ -38,7 +38,7 @@ const defaultMissionData = {
       direction: 230
     },
     {
-      _class: 'Ship',
+      _class: 'AiShip',
       type: 'playerShip',
       x: -2000,
       y: -2200,

@@ -5,6 +5,7 @@ import Footer from '../Footer/Footer';
 import Actor from '../../class/Actor';
 import DumbObject from '../../class/DumbObject';
 import SpaceStation from '../../class/SpaceStation';
+import AiShip from '../../class/AiShip';
 import Ship from '../../class/Ship';
 import GameComponent from '../Game/Game';
 import KeyboardControls from '../../services/KeyboardControls';
@@ -30,6 +31,7 @@ const configs = {
 };
 
 const classMap = {
+  'AiShip': AiShip,
   'Ship': Ship,
   'SpaceStation': SpaceStation,
   'DumbObject': DumbObject,
@@ -119,7 +121,18 @@ export default class MissionComponent extends React.Component {
       addActor( { type: 'alienClass2' } );
     });
 
-    const allShots = this.playerShip.state.shots; // .concat(blah.shots..)
+    const playerShots = this.playerShip.state.shots; // .concat(blah.shots..)
+    const enemyShots = this.mission.actors
+      // filter only actors with shots
+      .filter( ( actor ) => {
+        return Boolean( actor.state.shots && actor.state.shots.length );
+      })
+      // return the shots
+      .map( ( actor ) => actor.state.shots )
+      // flatten into single array
+      .reduce( ( shotsA, shotsB ) => {
+        return shotsA.concat( shotsB );
+      }, []);
 
     /* **** UPDATE THINGS **** */
     // update the Player ship
@@ -131,7 +144,10 @@ export default class MissionComponent extends React.Component {
     });
 
     // update the shots
-    allShots.forEach( ( shot ) => {
+    playerShots.forEach( ( shot ) => {
+      shot.update( delta );
+    });
+    enemyShots.forEach( ( shot ) => {
       shot.update( delta );
     });
 
@@ -142,12 +158,14 @@ export default class MissionComponent extends React.Component {
     });
 
     // handle collisions between shots and ships
-    allShots.forEach( ( shot ) => {
-      // TODO: how to handle shots fired by firer - currently destroys self!
-      // this.handleCollision( shot, this.playerShip, delta );
+    playerShots.forEach( ( shot ) => {
       this.mission.actors.forEach( ( thing ) => {
         gameUtils.handleCollision( thing, shot, delta );
       });
+    });
+
+    enemyShots.forEach( ( shot ) => {
+      gameUtils.handleCollision( shot, this.playerShip, delta );
     });
 
     // TODO: paint collisions
@@ -155,6 +173,8 @@ export default class MissionComponent extends React.Component {
     this.mission.actors = this.mission.actors.filter( ( actor ) => {
       return actor.alive;
     });
+
+    const allShots = playerShots.concat(enemyShots);
 
     /* **** UPDATE THE GAME'S STATE **** */
     this.setState({
