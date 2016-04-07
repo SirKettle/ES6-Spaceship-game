@@ -1,7 +1,7 @@
 
-import DumbObject from './DumbObject';
+import Actor from './Actor';
 
-class SpaceStation extends DumbObject {
+class SpaceStation extends Actor {
 
   constructor ( canvas, props ) {
 
