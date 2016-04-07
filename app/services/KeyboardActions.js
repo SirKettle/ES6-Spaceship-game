@@ -28,6 +28,9 @@ const KeyboardActions = {
       fire: ( delta ) => {
         console.log('fire!');
         ship.shoot();
+      },
+      bomb: ( delta ) => {
+        ship.bomb();
       }
     };
 

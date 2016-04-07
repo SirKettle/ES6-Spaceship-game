@@ -104,6 +104,19 @@ class Ship extends Actor {
     this._state.shots.push( shot );
   }
 
+  bomb () {
+    const { direction, speed, shotSpeed, shotPower } = this.state;
+    const { x, y } = this.circle;
+    const shot = new Shot( this._canvas, {
+      direction: direction,
+      speed: speed + shotSpeed,
+      power: 100,
+      health: 2,
+      size: 20,
+      x: x,
+      y: y,
+      color: 'ff0000'
+    });
 
     this._state.shots.push( shot );
   }

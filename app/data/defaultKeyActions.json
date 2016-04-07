@@ -13,7 +13,8 @@
     "save": [ 83 ],
     "roll": [ 82 ],
     "guides": [ 71 ],
-    "map": [ 77 ]
+    "map": [ 77 ],
+    "bomb": [ 66 ]
   },
   "alwaysRun": [ "pause", "guides", "map" ],
   "preventDefault": [ 40, 38, 37, 39 ]
