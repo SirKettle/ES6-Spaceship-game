@@ -29,6 +29,13 @@ const configs = {
   spaceStation: Object.assign({}, spaceStationData)
 };
 
+const classMap = {
+  'Ship': Ship,
+  'SpaceStation': SpaceStation,
+  'DumbObject': DumbObject,
+  'Actor': Actor
+};
+
 const injectImages = ( config ) => {
   config.imageUrls.forEach( ( name ) => {
     const img =  document.createElement( 'img' );
@@ -70,7 +77,47 @@ export default class MissionComponent extends React.Component {
 
   gameClock = null
 
+  getActorClass ( data ) {
+
+    const getClass = ( classKey ) => {
+      return classMap[ classKey ];
+    };
+
+    const ClassType = getClass( data._class );
+    return new ClassType(
+      this.state.canvas,
+      Object.assign(
+        {},
+        configs[ data.type ],
+        data
+      )
+    );
+  }
+
   updateGame ( delta ) {
+
+    /* **** GENERATE THINGS **** */
+
+    const addActor = ( data = {} ) => {
+      const defaultParams = {
+        _class: 'Ship',
+        type: 'alienClass1',
+        x: Math.floor(Math.random() * 4000 - 2000),
+        y: Math.floor(Math.random() * 4000 - 2000),
+        speed: Math.floor(Math.random() * 200),
+        direction: Math.floor(Math.random() * 360)
+      };
+
+      this.mission.actors.push( this.getActorClass( Object.assign( defaultParams, data ) ) );
+    };
+
+    gameUtils.doProbablyPerSeconds( delta, 20, () => {
+      addActor( { type: 'alienClass1' } );
+    });
+
+    gameUtils.doProbablyPerSeconds( delta, 20, () => {
+      addActor( { type: 'alienClass2' } );
+    });
 
     const allShots = this.playerShip.state.shots; // .concat(blah.shots..)
 
@@ -180,11 +227,8 @@ export default class MissionComponent extends React.Component {
   }
 
   reset () {
-    clearInterval(this.timerId);
-    this.timerId = null;
-  }
 
-  timerId = null
+  }
 
   save ( name ) {
 
@@ -233,40 +277,18 @@ export default class MissionComponent extends React.Component {
       canvas: canvasConfig
     });
 
-    this.playerShip = new Ship(
-      canvasConfig,
+    this.playerShip = this.getActorClass(
       Object.assign(
         {
           x: canvasConfig.width * 0.5,
           y: canvasConfig.height * 0.5
         },
-        configs[ missionData.playerShip.type ],
         missionData.playerShip
       )
     );
 
-    const getClass = ( classKey ) => {
-      const classMap = {
-        'Ship': Ship,
-        'SpaceStation': SpaceStation,
-        'DumbObject': DumbObject,
-        'Actor': Actor
-      };
-
-      return classMap[ classKey ];
-    };
-
-
-    this.mission.actors = missionData.actors.map( ( thing ) => {
-      const ClassType = getClass( thing._class );
-      return new ClassType(
-        canvasConfig,
-        Object.assign(
-          {},
-          configs[ thing.type ],
-          thing
-        )
-      );
+    this.mission.actors = missionData.actors.map( ( data ) => {
+      return this.getActorClass( data );
     });
 
     // this.mission.otherShips = missionData.ships.map( ( ship ) => {
@@ -288,22 +310,6 @@ export default class MissionComponent extends React.Component {
     this.gameClock.addAction( ( delta ) => {
       this.updateGame( delta );
     });
-
-    this.timerId = setInterval( () => {
-      this.mission.actors.push(new Ship(
-        canvasConfig,
-        Object.assign(
-          {},
-          configs.alienClass1,
-          {
-            x: Math.floor(Math.random() * 4000 - 2000),
-            y: Math.floor(Math.random() * 4000 - 2000),
-            speed: Math.floor(Math.random() * 200),
-            direction: Math.floor(Math.random() * 360)
-          }
-        )
-      ));
-    }, 5000);
   }
 
   // react core methods

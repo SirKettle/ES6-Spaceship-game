@@ -1,61 +1,53 @@
 
 const defaultMissionData = {
   playerShip: {
-    type: 'harrisonShip',
-    settings: {
-      _ready: true
-    }
+    _class: 'Ship',
+    type: 'harrisonShip'
   },
   actors: [
     {
-      _ready: true,
-      type: 'alienClass1',
       _class: 'Ship',
+      type: 'alienClass1',
       x: 200,
       y: 300,
       speed: 40,
       direction: 135
     },
     {
-      _ready: true,
-      type: 'alienClass2',
       _class: 'Ship',
+      type: 'alienClass2',
       x: 500,
       y: 200,
       speed: 400,
       direction: 20
     },
     {
-      _ready: true,
-      type: 'alienClass1',
       _class: 'Ship',
+      type: 'alienClass1',
       x: 200,
       y: 300,
       speed: 140,
       direction: 135
     },
     {
-      _ready: true,
-      type: 'frozenMoon',
       _class: 'Actor',
+      type: 'frozenMoon',
       x: 500,
       y: 200,
       speed: 200,
       direction: 230
     },
     {
-      _ready: true,
-      type: 'playerShip',
       _class: 'Ship',
+      type: 'playerShip',
       x: -2000,
       y: -2200,
       speed: 150,
       direction: 90
     },
     {
-      _ready: true,
-      type: 'spaceStation',
       _class: 'SpaceStation',
+      type: 'spaceStation',
       x: 1500,
       y: -1500,
       speed: 10,
