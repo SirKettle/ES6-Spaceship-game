@@ -1,0 +1,14 @@
+{
+  "type": "frozenMoon",
+  "name": "Moon of ice",
+  "health": 10000,
+  "power": 0,
+  "size": 150,
+  "speed": 0,
+  "x": 0,
+  "y": 0,
+  "imageUrls": [
+    "frozen_moon.png"
+  ],
+  "images": []
+}

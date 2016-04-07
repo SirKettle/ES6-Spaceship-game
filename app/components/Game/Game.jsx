@@ -22,6 +22,7 @@ export default class GameComponent extends React.Component {
     hero: React.PropTypes.object,
     actors: React.PropTypes.arrayOf(React.PropTypes.object),
     shots: React.PropTypes.arrayOf(React.PropTypes.object),
+    stats: React.PropTypes.arrayOf(React.PropTypes.object),
     score: React.PropTypes.object,
     showGuides: React.PropTypes.bool,
     showMap: React.PropTypes.bool,
@@ -55,7 +56,7 @@ export default class GameComponent extends React.Component {
 
     // Draw the other actors (ie enemy ships, space stations etc)
     actors.forEach( ( actor ) => {
-      canvasUtils.drawThing( ctx, enemy, getXPositionOffset( actor, hero ), getYPositionOffset( actor, hero ), showGuides );
+      canvasUtils.drawThing( ctx, actor, getXPositionOffset( actor, hero ), getYPositionOffset( actor, hero ), showGuides );
     });
 
     // Draw our moving grid line guides
@@ -89,12 +90,6 @@ export default class GameComponent extends React.Component {
     // 2nd layer - middle distance - moons, planets, stars etc - moving at 1/3 speed
   }
 
-  renderScene ( canvases ) {
-    this.renderGameCanvas( this.contexts.game );
-    this.renderMapCanvas( this.contexts.map );
-    this.renderSceneryCanvas( this.contexts.scenery );
-  }
-
   paintScore ( ctx ) {
     const { score, hero, shots } = this.props;
     ctx.fillStyle = '#ffffff';
@@ -105,7 +100,7 @@ export default class GameComponent extends React.Component {
   componentDidMount() {
     this.canvases = {
       game: this.refs.gameCanvas,
-      map: this.refs.mapCanvas
+      map: this.refs.mapCanvas,
       scenery: this.refs.sceneryCanvas
     };
 
@@ -117,8 +112,22 @@ export default class GameComponent extends React.Component {
     this.renderScene();
   }
 
+  renderScene ( canvases ) {
+    this.renderGameCanvas( this.contexts.game );
+    this.renderMapCanvas( this.contexts.map );
+    this.renderSceneryCanvas( this.contexts.scenery );
+  }
+
   componentDidUpdate() {
     this.renderScene();
+  }
+
+  renderStats() {
+    return this.props.stats.map( ( stat ) => {
+      return (
+        <tr key={ stat.label }><th>{ stat.label }</th><td>{ stat.value }</td></tr>
+      );
+    });
   }
 
   render() {
@@ -134,17 +143,23 @@ export default class GameComponent extends React.Component {
       <div className={ styles.Game }
         style={ inlineStyles }
       >
-        <canvas ref="gameCanvas"
-          className={ styles.CanvasGame }
-          width={ canvas.width }
-          height={ canvas.height }
-          onClick={ onCanvasClicked }
-        />
+        <table className={ styles.Stats }>
+          <tbody>
+            { this.renderStats() }
+          </tbody>
+        </table>
 
         <canvas ref="mapCanvas"
           className={ styles.CanvasMap }
           width={ map.width }
           height={ map.height }
+        />
+        
+        <canvas ref="gameCanvas"
+          className={ styles.CanvasGame }
+          width={ canvas.width }
+          height={ canvas.height }
+          onClick={ onCanvasClicked }
         />
 
         <canvas ref="sceneryCanvas"

@@ -27,10 +27,37 @@ const defaultMissionData = {
     },
     {
       _ready: true,
+      type: 'alienClass1',
+      _class: 'Ship',
+      x: 200,
+      y: 300,
+      speed: 140,
+      direction: 135
+    },
+    {
+      _ready: true,
+      type: 'frozenMoon',
+      _class: 'Actor',
+      x: 500,
+      y: 200,
+      speed: 200,
+      direction: 230
+    },
+    {
+      _ready: true,
+      type: 'playerShip',
+      _class: 'Ship',
+      x: -2000,
+      y: -2200,
+      speed: 150,
+      direction: 90
+    },
+    {
+      _ready: true,
       type: 'spaceStation',
       _class: 'SpaceStation',
-      x: 1,
-      y: 1,
+      x: 1500,
+      y: -1500,
       speed: 10,
       direction: 355
     }

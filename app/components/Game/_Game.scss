@@ -5,6 +5,19 @@
 	background-size: cover;
 }
 
+.Stats {
+	position: absolute;
+	bottom: 20px; left: 20px;
+	z-index: 4;
+	color: white;
+	pointer-events: none;
+
+	th, td {
+		padding: 3px 5px;
+		
+	}
+}
+
 .CanvasMap {
 	position: absolute;
 	bottom: 20px; right: 20px;

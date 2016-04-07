@@ -10,7 +10,7 @@ class SpaceStation extends DumbObject {
       type: 'spaceStation',
       name: 'Space Station',
       health: 100000,
-      power: -1, // This should result in increasing health while in collision
+      power: -0.005, // This should result in increasing health while in collision
       size: 300
     };
 

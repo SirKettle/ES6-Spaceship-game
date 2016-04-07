@@ -47,8 +47,8 @@ class Actor {
     }
   }
 
-  hit ( anotherActor ) {
-    this._state.health -= anotherActor.power;
+  hit ( anotherActor, delta ) {
+    this._state.health -= anotherActor.power * ( delta / 1000 );
   }
 
   update ( delta ) {

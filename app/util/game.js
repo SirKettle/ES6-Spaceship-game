@@ -27,12 +27,12 @@ const gameUtils = {
     return thing.y - offsetThing.y + canvasCenter - offsetThing.size * 0.5;
   },
 
-  handleCollision: ( thing1, thing2 ) => {
+  handleCollision: ( thing1, thing2, delta ) => {
     const isCollision = gameUtils.getIsCollision( thing1.circle, thing2.circle );
 
     if ( isCollision ) {
-      thing1.hit( thing2 );
-      thing2.hit( thing1 );
+      thing1.hit( thing2, delta );
+      thing2.hit( thing1, delta );
     }
   },
 
