@@ -132,6 +132,12 @@ export default class GameComponent extends React.Component {
     });
   }
 
+  getBackgroundPosition ( factor = 0.2 ) {
+    const { playerShip } = this.props;
+
+    return `${ -playerShip.x * factor }px ${ -playerShip.y * factor }px`;
+  }
+
   render() {
 
     const { canvas, map, onCanvasClicked } = this.props;
@@ -139,6 +145,7 @@ export default class GameComponent extends React.Component {
       backgroundImage: 'url(../../assets/space_bg.jpg)',
       width: canvas.width,
       height: canvas.height
+      // ,backgroundPosition: this.getBackgroundPosition()
     };
 
     return (

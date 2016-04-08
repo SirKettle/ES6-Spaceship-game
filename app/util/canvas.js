@@ -122,17 +122,17 @@ const canvasUtils = {
         ctx.lineTo( x + thing.size + crosshairOffset, center.y);
         ctx.stroke();
         ctx.closePath();
-    }
 
-    if ( typeof targetDirection === 'number' ) {
-        const xTo = gameUtils.getXPositionFromAngle( center.x, targetDirection, circle.radius + 30 );
-        const yTo = gameUtils.getYPositionFromAngle( center.y, targetDirection, circle.radius + 30 );
-        ctx.strokeStyle = '#ddaa00';
-        ctx.beginPath();
-        ctx.moveTo( center.x, center.y );
-        ctx.lineTo( xTo, yTo );
-        ctx.stroke();
-        ctx.closePath();
+        if ( typeof targetDirection === 'number' ) {
+            const xTo = gameUtils.getXPositionFromAngle( center.x, targetDirection, circle.radius + 30 );
+            const yTo = gameUtils.getYPositionFromAngle( center.y, targetDirection, circle.radius + 30 );
+            ctx.strokeStyle = '#ddaa00';
+            ctx.beginPath();
+            ctx.moveTo( center.x, center.y );
+            ctx.lineTo( xTo, yTo );
+            ctx.stroke();
+            ctx.closePath();
+        }
     }
   }
 
