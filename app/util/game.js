@@ -1,6 +1,19 @@
 
 const gameUtils = {
 
+  randomCoords: ( numPoints, maxX, maxY ) => {
+    const coords = [];
+    let count = 0;
+    while (count < numPoints) {
+      coords.push({
+        x: Math.floor( Math.random() * maxX ),
+        y: Math.floor( Math.random() * maxY )
+      })
+      count++;
+    }
+    return coords;
+  },
+
   doProbably: ( probability, doIt ) => {
     const oneIn = Math.floor( 1 / probability );
     if (gameUtils.rollDice(oneIn) === 1) {

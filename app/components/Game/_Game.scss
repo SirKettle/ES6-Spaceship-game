@@ -8,30 +8,36 @@
 .Stats {
 	position: absolute;
 	bottom: 20px; left: 20px;
-	z-index: 4;
+	z-index: 5;
 	color: white;
 	pointer-events: none;
 
 	th, td {
 		padding: 3px 5px;
-		
+
 	}
 }
 
 .CanvasMap {
 	position: absolute;
 	bottom: 20px; right: 20px;
-	z-index: 3;
+	z-index: 4;
 	pointer-events: none;
 }
 
 .CanvasGame {
 	position: absolute;
 	top: 0; left: 0;
-	z-index: 2;
+	z-index: 3;
 }
 
 .CanvasScenery {
+	position: absolute;
+	top: 0; left: 0;
+	z-index: 2;
+}
+
+.CanvasParallax {
 	position: absolute;
 	top: 0; left: 0;
 	z-index: 1;
