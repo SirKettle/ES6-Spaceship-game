@@ -59,7 +59,7 @@ export default class MissionComponent extends React.Component {
   state = {
     canvas: {},
     running: true,
-    hero: {},
+    playerShip: {},
     actors: [],
     shots: [],
     showGuides: true,
@@ -102,7 +102,7 @@ export default class MissionComponent extends React.Component {
 
     const addActor = ( data = {} ) => {
       const defaultParams = {
-        _class: 'Ship',
+        _class: 'AiShip',
         type: 'alienClass1',
         x: Math.floor(Math.random() * 4000 - 2000),
         y: Math.floor(Math.random() * 4000 - 2000),
@@ -136,10 +136,14 @@ export default class MissionComponent extends React.Component {
 
     /* **** UPDATE THINGS **** */
     // update the Player ship
+    this.playerShip.target = this.mission.actors.sort( ( a, b ) => {
+      return gameUtils.getDistance( this.playerShip.circle, a.circle ) > gameUtils.getDistance( this.playerShip.circle, b.circle );
+    })[0];
     this.playerShip.update( delta );
 
     // update the other ships
     this.mission.actors.forEach( ( thing ) => {
+      thing.target = this.playerShip;
       thing.update( delta );
     });
 
@@ -178,7 +182,7 @@ export default class MissionComponent extends React.Component {
 
     /* **** UPDATE THE GAME'S STATE **** */
     this.setState({
-      hero: this.playerShip.state,
+      playerShip: this.playerShip.state,
       actors: this.mission.actors.map( ( actor ) => actor.state ),
       shots: allShots.map( ( shot ) => shot.state ),
       map: this.getMapState(),
@@ -373,7 +377,7 @@ export default class MissionComponent extends React.Component {
       <div className={ styles.Mission }>
         { this.renderPauseScreen() }
         <GameComponent
-          hero={ this.state.hero }
+          playerShip={ this.state.playerShip }
           actors={ this.state.actors }
           shots={ this.state.shots }
           stats={ this.state.stats }

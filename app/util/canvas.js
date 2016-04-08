@@ -85,7 +85,7 @@ const canvasUtils = {
   },
 
   drawThing: ( ctx, thing, x, y, showGuides = true ) => {
-    const { image, circle, direction } = thing;
+    const { image, circle, direction, targetDirection } = thing;
     if ( !image ) {
       console.warn( 'image not found', thing );
       return;
@@ -100,21 +100,37 @@ const canvasUtils = {
     ctx.drawImage( image, -image.width * 0.5, -image.width * 0.5 );
     ctx.restore();
 
+    const center = {
+        x: x + thing.size * 0.5,
+        y: y + thing.size * 0.5
+    };
+
     // draw the health status
     let healthColor = guidesColor;
     if ( thing.health < 1 ) { healthColor = '#ddaa00'; }
     if ( thing.health < 0.5 ) { healthColor = '#ff0000'; }
-    canvasUtils.drawHoop( ctx, x + thing.size * 0.5, y + thing.size * 0.5, circle.radius - 5, healthColor, 3);
+    canvasUtils.drawHoop( ctx, center.x, center.y, circle.radius - 5, healthColor, 3);
 
     if ( showGuides ) {
         // todo - make the cross hairs bigger than the circle
-        canvasUtils.drawHoop( ctx, x + thing.size * 0.5, y + thing.size * 0.5, circle.radius, guidesColor);
+        canvasUtils.drawHoop( ctx, center.x, center.y, circle.radius, guidesColor);
         ctx.strokeStyle = guidesColor;
         ctx.beginPath();
-        ctx.moveTo( x + thing.size * 0.5, y - crosshairOffset);
-        ctx.lineTo( x + thing.size * 0.5, y + thing.size + crosshairOffset);
-        ctx.moveTo( x - crosshairOffset, y + thing.size * 0.5);
-        ctx.lineTo( x + thing.size + crosshairOffset, y + thing.size * 0.5);
+        ctx.moveTo( center.x, y - crosshairOffset);
+        ctx.lineTo( center.x, y + thing.size + crosshairOffset);
+        ctx.moveTo( x - crosshairOffset, center.y);
+        ctx.lineTo( x + thing.size + crosshairOffset, center.y);
+        ctx.stroke();
+        ctx.closePath();
+    }
+
+    if ( typeof targetDirection === 'number' ) {
+        const xTo = gameUtils.getXPositionFromAngle( center.x, targetDirection, circle.radius + 30 );
+        const yTo = gameUtils.getYPositionFromAngle( center.y, targetDirection, circle.radius + 30 );
+        ctx.strokeStyle = '#ddaa00';
+        ctx.beginPath();
+        ctx.moveTo( center.x, center.y );
+        ctx.lineTo( xTo, yTo );
         ctx.stroke();
         ctx.closePath();
     }

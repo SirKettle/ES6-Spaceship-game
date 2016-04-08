@@ -19,7 +19,7 @@ export default class GameComponent extends React.Component {
       direction: React.PropTypes.number,
       ships: React.PropTypes.arrayOf(React.PropTypes.object)
     }).isRequired,
-    hero: React.PropTypes.object,
+    playerShip: React.PropTypes.object,
     actors: React.PropTypes.arrayOf(React.PropTypes.object),
     shots: React.PropTypes.arrayOf(React.PropTypes.object),
     stats: React.PropTypes.arrayOf(React.PropTypes.object),
@@ -69,7 +69,7 @@ export default class GameComponent extends React.Component {
   }
 
   renderGameCanvas = ( ctx ) => {
-    const { canvas, map, hero, actors, shots, showGuides, showMap } = this.props;
+    const { canvas, map, playerShip, actors, shots, showGuides, showMap } = this.props;
 
     const getXPositionOffset = ( thing, offsetThing ) => {
       return gameUtils.getXPositionOffset( thing, offsetThing, canvas );
@@ -82,27 +82,27 @@ export default class GameComponent extends React.Component {
     // clear the canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    if ( !hero._ready ) { return };
+    if ( !playerShip._ready ) { return };
 
     // TODO: ONLY DRAW THINGS WHICH ARE VISIBLE IN THE CANVAS FRAME
 
     // Draw the shots
     shots.forEach( ( shot ) => {
-      canvasUtils.drawShot( canvas, ctx, getXPositionOffset( shot, hero ), getYPositionOffset( shot, hero ), shot.direction, shot.size, shot.health );
+      canvasUtils.drawShot( canvas, ctx, getXPositionOffset( shot, playerShip ), getYPositionOffset( shot, playerShip ), shot.direction, shot.size, shot.health );
     });
 
     // Draw the other actors (ie enemy ships, space stations etc)
     actors.forEach( ( actor ) => {
-      canvasUtils.drawThing( ctx, actor, getXPositionOffset( actor, hero ), getYPositionOffset( actor, hero ), showGuides );
+      canvasUtils.drawThing( ctx, actor, getXPositionOffset( actor, playerShip ), getYPositionOffset( actor, playerShip ), showGuides );
     });
 
     // Draw our moving grid line guides
     if ( showGuides ) {
-      canvasUtils.drawMovingGrid( canvas, ctx, hero );
+      canvasUtils.drawMovingGrid( canvas, ctx, playerShip );
     }
 
     // Draw our player spaceship
-    canvasUtils.drawThing( ctx, hero, getXPositionOffset( hero, hero ), getYPositionOffset( hero, hero ), showGuides );
+    canvasUtils.drawThing( ctx, playerShip, getXPositionOffset( playerShip, playerShip ), getYPositionOffset( playerShip, playerShip ), showGuides );
 
     // TODO: replace this with a simple div for performance
     this.paintScore( ctx );
@@ -128,10 +128,10 @@ export default class GameComponent extends React.Component {
   }
 
   paintScore ( ctx ) {
-    const { score, hero, shots } = this.props;
+    const { score, playerShip, shots } = this.props;
     ctx.fillStyle = '#ffffff';
     ctx.font = 'bold 26px sans-serif';
-    ctx.fillText( parseInt(hero.x) + ' by ' + parseInt(hero.y) + ' - px/s: ' + parseInt(hero.speed) + ' - SHOTS: ' + shots.length, 40, 43);
+    ctx.fillText( parseInt(playerShip.x) + ' by ' + parseInt(playerShip.y) + ' - px/s: ' + parseInt(playerShip.speed) + ' - SHOTS: ' + shots.length, 40, 43);
   }
 
   componentDidMount() {
