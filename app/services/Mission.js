@@ -1,5 +1,8 @@
 
 const defaultMissionData = {
+  settings: {
+    maxEnemies: 10
+  },
   playerShip: {
     _class: 'Ship',
     type: 'harrisonShip'

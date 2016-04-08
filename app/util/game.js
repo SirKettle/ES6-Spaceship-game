@@ -11,6 +11,7 @@ const gameUtils = {
       })
       count++;
     }
+    
     return coords;
   },
 

@@ -3,9 +3,8 @@ import objectUtils from '../util/object';
 
 class GameClock {
 
-    constructor ( delta = 20 ) {
+    constructor (  ) {
         this._isRunning = false;
-        this.delta = delta;
         this.actions = {};
         this.actionCount = 0;
         this.intervalId = null;
@@ -83,6 +82,10 @@ class GameClock {
 
     get delta () {
       return this._delta;
+    }
+
+    get fps () {
+      return this.delta && Math.floor(1000 / this.delta);
     }
 
     get isRunning () {

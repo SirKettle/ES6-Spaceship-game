@@ -35,37 +35,35 @@ export default class GameComponent extends React.Component {
 
   parallaxCoords = []
 
-  renderParallax = ( ctx, factor = 1, coords = [] ) => {
+  renderParallax = ( ctx, factor = 1, coords = [], opacity = 1 ) => {
     const { canvas, playerShip } = this.props;
 
-    const updateCoord = ( current, change, max ) => {
-      const newCoord = current - change;
+    const updateCoord = ( current, change = 0, max ) => {
+      let newCoord = current - (change % max);
 
       if ( newCoord < 0 ) {
-        return max + newCoord;
+        newCoord = max + newCoord;
       }
 
-      return newCoord;
+      return newCoord % max;
     }
 
     const moveBy = {
-      x: playerShip.x * factor,
-      y: playerShip.y * factor
+      x: (playerShip.x || 0) * factor,
+      y: (playerShip.y || 0) * factor
     };
 
     // clear the canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     coords = coords.map( ( point ) => {
-      point = {
+      const newPoint = {
         x: updateCoord( point.x, moveBy.x, canvas.width),
         y: updateCoord( point.y, moveBy.y, canvas.height)
       };
-      canvasUtils.drawCircle(ctx, point.x, point.y, 1, 'rgba( 255, 255, 255, 0.3 )');
-      return point;
+      canvasUtils.drawCircle(ctx, newPoint.x, newPoint.y, 1, `rgba( 255, 255, 255, ${ opacity } )`);
+      return newPoint;
     });
-
-    return coords;
   }
 
   renderGameCanvas = ( ctx ) => {
@@ -135,6 +133,8 @@ export default class GameComponent extends React.Component {
   }
 
   componentDidMount() {
+    const { canvas } = this.props;
+
     this.canvases = {
       game: this.refs.gameCanvas,
       map: this.refs.mapCanvas,
@@ -148,8 +148,8 @@ export default class GameComponent extends React.Component {
       this.contexts[ canvasKey ] = canvasElem.getContext('2d');
     });
 
-    this.parallaxCoords.push( gameUtils.randomCoords( 100, canvas.width, canvas.height ) );
-    this.parallaxCoords.push( gameUtils.randomCoords( 200, canvas.width, canvas.height ) );
+    this.parallaxCoords.push( gameUtils.randomCoords( 20, canvas.width, canvas.height ) );
+    this.parallaxCoords.push( gameUtils.randomCoords( 40, canvas.width, canvas.height ) );
 
     this.renderScene();
   }
@@ -159,8 +159,8 @@ export default class GameComponent extends React.Component {
     this.renderMapCanvas( this.contexts.map );
     this.renderSceneryCanvas( this.contexts.scenery );
     // could add many levels of this
-    this.parallaxCoords[0] = this.renderParallax( this.contexts.parallaxForeground, 0.75, this.parallaxCoords[0] );
-    this.parallaxCoords[0] = this.renderParallax( this.contexts.parallaxBackground, 0.25, this.parallaxCoords[0] );
+    this.renderParallax( this.contexts.parallaxForeground, 0.5, this.parallaxCoords[0], 0.9 );
+    this.renderParallax( this.contexts.parallaxBackground, 0.1, this.parallaxCoords[1], 0.6 );
   }
 
   componentDidUpdate() {
@@ -216,20 +216,20 @@ export default class GameComponent extends React.Component {
 
         <canvas ref="parallaxForegroundCanvas"
           className={ styles.CanvasParallax }
-          width={ map.width }
-          height={ map.height }
+          width={ canvas.width }
+          height={ canvas.height }
         />
 
         <canvas ref="parallaxBackgroundCanvas"
           className={ styles.CanvasParallax }
-          width={ map.width }
-          height={ map.height }
+          width={ canvas.width }
+          height={ canvas.height }
         />
 
         <canvas ref="sceneryCanvas"
           className={ styles.CanvasScenery }
-          width={ map.width }
-          height={ map.height }
+          width={ canvas.width }
+          height={ canvas.height }
         />
       </div>
     );

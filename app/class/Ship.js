@@ -113,6 +113,11 @@ class Ship extends Actor {
       y: y
     });
 
+    // TODO: need to filter out shots too far away
+    if ( true ) {
+      console.log('PLAY SOUND - LASER');
+    }
+
     this._state.shots.push( shot );
   }
 
@@ -129,6 +134,11 @@ class Ship extends Actor {
       y: y,
       color: 'ff0000'
     });
+
+    // TODO: need to filter out shots too far away
+    if ( true ) {
+      console.log('PLAY SOUND - BOMB');
+    }
 
     this._state.shots.push( shot );
   }

@@ -96,6 +96,22 @@ export default class MissionComponent extends React.Component {
     );
   }
 
+  cumulativeDelta = 0
+
+  updatePerMilliseconds ( delta, ms = 1000 ) {
+    this.cumulativeDelta += delta;
+    if ( this.cumulativeDelta < ms ) {
+      return;
+    }
+
+    this.cumulativeDelta = this.cumulativeDelta % ms;
+
+    /* **** UPDATE THE GAME'S STATE **** */
+    this.setState({
+      stats: this.getStats()
+    });
+  }
+
   updateGame ( delta ) {
 
     /* **** GENERATE THINGS **** */
@@ -113,13 +129,16 @@ export default class MissionComponent extends React.Component {
       this.mission.actors.push( this.getActorClass( Object.assign( defaultParams, data ) ) );
     };
 
-    gameUtils.doProbablyPerSeconds( delta, 20, () => {
-      addActor( { type: 'alienClass1' } );
-    });
+    if ( this.mission.actors.length < this.mission.settings.maxEnemies ) {
+      
+      gameUtils.doProbablyPerSeconds( delta, 20, () => {
+        addActor( { type: 'alienClass1' } );
+      });
 
-    gameUtils.doProbablyPerSeconds( delta, 20, () => {
-      addActor( { type: 'alienClass2' } );
-    });
+      gameUtils.doProbablyPerSeconds( delta, 20, () => {
+        addActor( { type: 'alienClass2' } );
+      });
+    }
 
     const playerShots = this.playerShip.state.shots; // .concat(blah.shots..)
     const enemyShots = this.mission.actors
@@ -137,7 +156,7 @@ export default class MissionComponent extends React.Component {
     /* **** UPDATE THINGS **** */
     // update the Player ship
     this.playerShip.target = this.mission.actors.sort( ( a, b ) => {
-      return gameUtils.getDistance( this.playerShip.circle, a.circle ) > gameUtils.getDistance( this.playerShip.circle, b.circle );
+      return Boolean( gameUtils.getDistance( this.playerShip.circle, a.circle ) > gameUtils.getDistance( this.playerShip.circle, b.circle ) ) ? 1 : -1;
     })[0];
     this.playerShip.update( delta );
 
@@ -185,15 +204,18 @@ export default class MissionComponent extends React.Component {
       playerShip: this.playerShip.state,
       actors: this.mission.actors.map( ( actor ) => actor.state ),
       shots: allShots.map( ( shot ) => shot.state ),
-      map: this.getMapState(),
-      stats: this.getStats()
+      map: this.getMapState()
     });
+
+    this.updatePerMilliseconds( delta, 200 );
   }
 
   getStats () {
     const stats = [];
 
     stats.push({ label: 'Health', value: this.playerShip.health });
+    stats.push({ label: 'F.P.S.', value: this.gameClock.fps });
+    // stats.push({ label: 'delta', value: this.gameClock.delta });
 
     return stats;
   }
@@ -291,7 +313,10 @@ export default class MissionComponent extends React.Component {
     const missionData = MissionService.load( missionKey );
     if ( !missionData ) { return; }
 
-    this.mission = {};
+    this.mission = {
+      settings: missionData.settings
+    };
+
     const canvasConfig = {
       width: document.body.clientWidth,
       height: document.body.clientHeight
@@ -326,7 +351,7 @@ export default class MissionComponent extends React.Component {
     //   );
     // });
 
-    this.gameClock = Game.Clock( missionData.timeLeft );
+    this.gameClock = Game.Clock();
     this.gameClock.start();
     // add actions to keyboard events
     KeyboardControls.bind( this.gameClock, this.getKeyboardActions() );
@@ -337,6 +362,19 @@ export default class MissionComponent extends React.Component {
   }
 
   // react core methods
+
+  componentWillMount () {
+
+    const canvasConfig = {
+      width: document.body.clientWidth,
+      height: document.body.clientHeight
+    };
+
+    this.setState({
+      canvas: canvasConfig
+    });
+
+  }
 
   componentWillUnmount () {
 
@@ -350,7 +388,6 @@ export default class MissionComponent extends React.Component {
   }
 
   componentDidMount () {
-
     const missionKey = this.props.location.query.key;
     if ( missionKey ) {
       this.loadMission( missionKey );
