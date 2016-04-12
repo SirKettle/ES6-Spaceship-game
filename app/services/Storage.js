@@ -12,8 +12,13 @@ const Store = {
     window.localStorage.removeItem( key );
   },
 
+  has: ( key ) => {
+    return Boolean( window.localStorage.hasOwnProperty( key ) );
+  },
+
   get: ( key ) => {
     const dataString = window.localStorage.getItem( key );
+
     if ( !dataString ) {
       console.warn( 'No record found in store', key );
       return;
@@ -35,11 +40,21 @@ const Store = {
 
   set: ( key, data ) => {
 
-    const recordString = JSON.stringify({
-      data: data
-    });
+    let recordString;
 
-    window.localStorage.setItem( key, recordString );
+    try {
+      recordString = JSON.stringify({
+        data: data
+      });
+    }
+    catch ( error ) {
+      console.warn( 'Error converting to string - probably trying to stringify a Class', key, data, error );
+      return;
+    }
+
+    if ( recordString ) {
+      window.localStorage.setItem( key, recordString );
+    }
   }
 
 }

@@ -1,5 +1,12 @@
 
+import Store from './Storage';
+
 const CHANNELS = 10;
+const DEFAULT_MASTER_VOLUME = 0.5;
+
+/* *******************************
+  Harrison and Elliot Audio Deck
+******************************* */
 
 class HeadSfx {
 
@@ -9,9 +16,14 @@ class HeadSfx {
       return;
     }
 
+    if ( Store.has( this.masterVolumeStoreKey ) ) {
+      // if has volume stored - use it
+      this.masterVolume = Store.get( this.masterVolumeStoreKey );
+    }
+
+    // set up the channels
     this.channels = [];
     this.channelIndex = 0;
-    this.masterVolume = 0.5;
 
     let channelCount = 0;
     while ( channelCount < CHANNELS ) {
@@ -49,11 +61,45 @@ class HeadSfx {
     return this.channels[ this.channelIndex ];
   }
 
+  get masterVolumeStoreKey () {
+    return `${ this.storeKey }master_volume`;
+  }
+
+  get storeKey () {
+    return '_audio__';
+  }
+
   get masterVolume () {
+    if ( typeof this._masterVolume === 'undefined' ) {
+      return DEFAULT_MASTER_VOLUME;
+    }
+
     return this._masterVolume;
   }
 
   set masterVolume ( vol ) {
+
+    if ( typeof vol !== 'number' ) {
+      console.warn('Volume must be a number');
+      return;
+    }
+
+    if ( vol < 0 ) {
+      console.warn('Volume cannot be less than zero');
+      return;
+    }
+
+    if ( vol > 1 ) {
+      console.warn('Volume cannot be more than one');
+      return;
+    }
+
+    // store volume
+    Store.set(
+      this.masterVolumeStoreKey,
+      this.masterVolume
+    );
+
     return this._masterVolume = vol;
   }
 }

@@ -115,7 +115,7 @@ class MissionService {
   }
 
   get storeKey () {
-    return '_mission';
+    return '_mission__';
   }
 }
 
