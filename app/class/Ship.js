@@ -2,6 +2,8 @@
 import Actor from './Actor';
 import Shot from './Shot';
 import gameUtils from '../util/game';
+import HeadSfx from '../services/Audio';
+import SOUNDS from '../services/Sounds';
 
 class Ship extends Actor {
 
@@ -69,11 +71,19 @@ class Ship extends Actor {
     this._state.direction = newDirection;
   }
 
-  turnToward ( delta, target ) {
-  //   const directionOfTarget;
-  //   const turnBy = this.state.turnSpeed / delta;
-  //   const newDirection =  this.changeDirection( -turnBy );
-  //   this.turnLeft( delta )
+  turnToward ( delta, direction ) {
+    
+    const diff = direction - this.state.direction;
+    const turnBy = Math.min( this.state.turnSpeed / delta, diff );
+
+    const isLeftTurn = gameUtils.getIsDirectionToLeft( this.state.direction, direction );
+
+    if ( isLeftTurn ) {
+      this._state.direction =  this.changeDirection( -turnBy );
+      return;
+    }
+
+    this._state.direction =  this.changeDirection( turnBy );
   }
 
   strafeLeft ( delta ) {
@@ -113,12 +123,21 @@ class Ship extends Actor {
       y: y
     });
 
+    this._state.shots.push( shot );
+
     // TODO: need to filter out shots too far away
-    if ( true ) {
-      console.log('PLAY SOUND - LASER');
+    if ( this.state._class === 'AiShip' ) {
+      // console.log('Alien shot');
+      HeadSfx.play( SOUNDS.LASER_ALIEN_1, this.audioVolume );
+      
     }
 
-    this._state.shots.push( shot );
+    if ( this.state._class === 'Ship' ) {
+      // console.log('Player shot');
+      HeadSfx.play( SOUNDS.LASER_PLAYER, 1 );
+
+
+    }
   }
 
   bomb () {
@@ -136,15 +155,14 @@ class Ship extends Actor {
     });
 
     // TODO: need to filter out shots too far away
-    if ( true ) {
-      console.log('PLAY SOUND - BOMB');
+    if ( this.state._class === 'Ship' ) {
+      HeadSfx.play( SOUNDS.LASER_LONG, 1 );
     }
 
     this._state.shots.push( shot );
   }
 
   update ( delta ) {
-    super.update( delta );
 
     this._state.shots = this.state.shots.filter( ( shotInstance ) => {
       const shot = shotInstance.state;
@@ -155,6 +173,7 @@ class Ship extends Actor {
     });
     // update the targetDirection
     this._state.targetDirection = this.targetDirection;
+    super.update( delta );
   }
 
   get target () {
@@ -163,6 +182,10 @@ class Ship extends Actor {
 
   set target ( _target ) {
     this._state.target = _target;
+  }
+
+  get targetDistance () {
+    return gameUtils.getDistance( this.state.circle, this.target.circle );
   }
 
   get targetDirection () {

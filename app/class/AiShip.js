@@ -17,15 +17,22 @@ class AiShip extends Ship {
   }
 
   update ( delta  ) {
-    super.update( delta );
 
     // Turn to face target
 
-    // this.turnToward( delta, nearestTarget );
+    this.turnToward( delta, this.targetDirection );
+
+
 
 
 
     // Alter speed to got to target (maybe set to 200)
+    if ( this.targetDistance > 600 ) {
+      this.accelerate( delta );
+    }
+    else {
+      this.decelerate( delta );
+    }
 
 
 
@@ -39,6 +46,7 @@ class AiShip extends Ship {
       this.shoot( this.targetDirection );
     });
 
+    super.update( delta );
   }
 }
 

@@ -1,4 +1,6 @@
 import gameUtils from '../util/game';
+import HeadSfx from '../services/Audio';
+import SOUNDS from '../services/Sounds';
 
 class Actor {
 
@@ -57,6 +59,10 @@ class Actor {
     if ( this.state.health > this.state.maxHealth ) {
       this._state.health = this._state.maxHealth;
     }
+
+    if ( this.state.health <= 0 ) {
+      HeadSfx.play( SOUNDS.EXPLOSION, this.audioVolume );
+    }
   }
 
   update ( delta ) {
@@ -70,6 +76,10 @@ class Actor {
     this._state.image = this.image;
     // update the circle
     this._state.circle = this.circle;
+  }
+
+  get audioVolume () {
+    return this.target && gameUtils.getVolumeByDistance( this.state, this.target ) || 1;
   }
 
   get circle () {
@@ -90,7 +100,7 @@ class Actor {
       return this.state.images[ 0 ];
     }
 
-    const speedIndex = Math.round( this.state.speed / this.state.maxSpeed * ( imageCount - 2 ) );
+    const speedIndex = Math.round( this.state.speed / this.state.maxSpeed * ( imageCount - 1 ) );
     return this.state.images[ speedIndex ];
   }
 

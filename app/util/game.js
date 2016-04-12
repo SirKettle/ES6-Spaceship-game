@@ -11,7 +11,7 @@ const gameUtils = {
       })
       count++;
     }
-    
+
     return coords;
   },
 
@@ -64,6 +64,13 @@ const gameUtils = {
     return Math.sqrt( dx * dx + dy * dy );
   },
 
+  // get the sound volume based on distance from target
+  getVolumeByDistance: ( object1, object2 ) => {
+    const distance = gameUtils.getDistance( object1.circle, object2.circle );
+    const maxDistance = 1500;
+    return Math.max( 0 , maxDistance - distance ) / maxDistance;
+  },
+
   handleCollision: ( thing1, thing2, delta ) => {
     const isCollision = gameUtils.getIsCollision( thing1.circle, thing2.circle );
 
@@ -90,6 +97,21 @@ const gameUtils = {
     }
 
     return newDirection % 360;
+  },
+
+  getIsDirectionToLeft: ( sourceDirection, targetDirection ) => {
+    const diff = sourceDirection - targetDirection;
+
+    if ( diff < 0 ) {
+      if ( diff < -180 ) {
+        return true;
+      }
+      return false;
+    }
+    if ( diff > 180 ) {
+      return true;
+    }
+    return false;
   },
 
   getXPositionFromAngle: ( xStart, angleDegrees, distance ) => {
