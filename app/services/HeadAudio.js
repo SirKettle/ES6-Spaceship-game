@@ -19,18 +19,18 @@ class HeadAudio {
     this.channelIndex = 0;
 
     let channelCount = 0;
-    
+
     while ( channelCount < channels ) {
       this.channels.push( document.createElement('audio') );
       channelCount += 1;
     }
-    
+
     // get and set the master volume
     if ( Store.has( this.masterVolumeStoreKey ) ) {
       // if has volume stored - use it
       this.masterVolume = Store.get( this.masterVolumeStoreKey );
     }
-    
+
     // get and set the volume
     if ( Store.has( this.volumeStoreKey ) ) {
       // if has volume stored - use it
@@ -50,6 +50,25 @@ class HeadAudio {
     channel.pause();
   }
 
+  isValidVolume ( vol ) {
+    if ( typeof vol !== 'number' ) {
+      console.warn('Volume must be a number');
+      return false;
+    }
+
+    if ( vol < 0 ) {
+      console.warn('Volume cannot be less than zero');
+      return false;
+    }
+
+    if ( vol > 1 ) {
+      console.warn('Volume cannot be more than one');
+      return false;
+    }
+
+    return true;
+  }
+
   get currentChannel () {
     return this.channels[ this.channelIndex ];
   }
@@ -64,14 +83,18 @@ class HeadAudio {
     return this.currentChannel;
   }
 
+  // Store keys for saving state
+  // Master volume: represents the volume of all audio
   get masterVolumeStoreKey () {
-    return `_head_audio__master_volume`;
+    return `_HeadAudio__master_volume`;
   }
 
+  // Volume: represents the volume of the class (ie HeadRadio)
   get volumeStoreKey () {
     return `${ this.storeKey }volume`;
   }
 
+  // The store key of the class (ie )
   get storeKey () {
     return this._storeKey;
   }
@@ -89,29 +112,13 @@ class HeadAudio {
   }
 
   set volume ( vol ) {
-
-    if ( typeof vol !== 'number' ) {
-      console.warn('Volume must be a number');
+    if ( !this.isValidVolume( vol ) ) {
       return;
     }
-
-    if ( vol < 0 ) {
-      console.warn('Volume cannot be less than zero');
-      return;
-    }
-
-    if ( vol > 1 ) {
-      console.warn('Volume cannot be more than one');
-      return;
-    }
-
     // store volume
-    Store.set(
-      this.volumeStoreKey,
-      vol
-    );
-
-    return this._volume = vol;
+    Store.set( this.volumeStoreKey, vol );
+    // set volumne
+    this._volume = vol;
   }
 
   get masterVolume () {
@@ -123,29 +130,13 @@ class HeadAudio {
   }
 
   set masterVolume ( vol ) {
-
-    if ( typeof vol !== 'number' ) {
-      console.warn('Volume must be a number');
+    if ( !this.isValidVolume( vol ) ) {
       return;
     }
-
-    if ( vol < 0 ) {
-      console.warn('Volume cannot be less than zero');
-      return;
-    }
-
-    if ( vol > 1 ) {
-      console.warn('Volume cannot be more than one');
-      return;
-    }
-
     // store volume
-    Store.set(
-      this.masterVolumeStoreKey,
-      vol
-    );
-
-    return this._masterVolume = vol;
+    Store.set( this.masterVolumeStoreKey, vol );
+    // set volumne
+    this._masterVolume = vol;
   }
 }
 
