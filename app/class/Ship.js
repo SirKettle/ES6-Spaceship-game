@@ -2,7 +2,7 @@
 import Actor from './Actor';
 import Shot from './Shot';
 import gameUtils from '../util/game';
-import HeadSfx from '../services/Audio';
+import HeadSfx from '../services/HeadSfx';
 import SOUNDS from '../services/Sounds';
 
 class Ship extends Actor {

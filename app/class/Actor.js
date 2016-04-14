@@ -1,5 +1,5 @@
 import gameUtils from '../util/game';
-import HeadSfx from '../services/Audio';
+import HeadSfx from '../services/HeadSfx';
 import SOUNDS from '../services/Sounds';
 
 class Actor {
