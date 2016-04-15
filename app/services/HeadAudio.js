@@ -1,5 +1,6 @@
 
 import Store from './Storage';
+import validate from '../util/validate';
 
 const DEFAULT_MASTER_VOLUME = 0.5;
 
@@ -50,23 +51,14 @@ class HeadAudio {
     channel.pause();
   }
 
+  stop () {
+    const channel = this.currentChannel;
+    channel.pause();
+    channel.src = '';
+  }
+
   isValidVolume ( vol ) {
-    if ( typeof vol !== 'number' ) {
-      console.warn('Volume must be a number');
-      return false;
-    }
-
-    if ( vol < 0 ) {
-      console.warn('Volume cannot be less than zero');
-      return false;
-    }
-
-    if ( vol > 1 ) {
-      console.warn('Volume cannot be more than one');
-      return false;
-    }
-
-    return true;
+    return validate.number.between( vol, 0, 1 );
   }
 
   get currentChannel () {

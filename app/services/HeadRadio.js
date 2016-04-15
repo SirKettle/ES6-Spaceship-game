@@ -3,7 +3,7 @@ import Store from './Storage';
 import HeadAudio from './HeadAudio';
 import radioStations from './radioStations';
 
-const CHANNELS = 3;
+const CHANNELS = 1;
 
 /* *******************************
   Harrison and Elliot Audio Deck
@@ -11,7 +11,7 @@ const CHANNELS = 3;
 
 class HeadRadio extends HeadAudio {
 
-  constructor ( isOn = true ) {
+  constructor ( ) {
     if ( !HeadRadio.isCreating ) {
       throw new Error( 'You cannot call new in Singleton instances!' );
       return;
@@ -22,7 +22,10 @@ class HeadRadio extends HeadAudio {
     this.stations = radioStations;
     this.selectStation( 0 );
     this.currentTrackIndex = 0;
-    this.isOn = isOn;
+    this.isOn = false;
+    this.currentChannel.addEventListener( 'ended', () => {
+      this.playNextTrack();
+    });
   }
 
   static getInstance () {
@@ -37,18 +40,25 @@ class HeadRadio extends HeadAudio {
 
   playTrack () {
     const src = this.track.src;
-    this.play( src );
+    const self = this;
+    super.play( src );
   }
 
   playNextTrack () {
-
+    console.log('play next track');
+    
+    let nextTrackIndex = this.currentTrackIndex + 1;
+    if ( !this.station.tracks[ nextTrackIndex ] ) {
+      nextTrackIndex = 0;
+    }
+    this.currentTrackIndex = nextTrackIndex;
+    this.playTrack();
   }
 
   handlePowerOn () {
     // get station
     // get src
     this.playTrack();
-
   }
 
   handlePowerOff () {
@@ -64,6 +74,10 @@ class HeadRadio extends HeadAudio {
     this.isOn = false;
   }
 
+  togglePower () {
+    this.isOn = !this.isOn;
+  }
+
   nextStation () {
     let nextStationIndex = this.currentStationIndex + 1;
 
@@ -71,9 +85,7 @@ class HeadRadio extends HeadAudio {
       nextStationIndex = 0;
     }
 
-    this.currentStationIndex = nextStationIndex;
-
-    if 
+    this.selectStation( nextStationIndex );
   }
 
   prevStation () {
@@ -83,11 +95,16 @@ class HeadRadio extends HeadAudio {
       nextStationIndex = this.stations.length - 1;
     }
 
-    this.currentStationIndex = nextStationIndex;
+    this.selectStation( nextStationIndex );
   }
 
   selectStation ( index ) {
     this.currentStationIndex = index;
+
+    if ( !this.isOn ) { return; }
+
+    this.stop();
+    this.playTrack();
   }
 
   turnUp () {
@@ -96,6 +113,10 @@ class HeadRadio extends HeadAudio {
 
   turnDown () {
     console.log('turn down radio vol');
+  }
+
+  hasStation ( index ) {
+    return Boolean( this.stations[ index ] );
   }
 
   get isOn () {
@@ -115,6 +136,14 @@ class HeadRadio extends HeadAudio {
     this.handlePowerOff();
   }
 
+  get state () {
+    return {
+      currentTrack: this.track,
+      currentStation: this.station,
+      stations: this.stations
+    }
+  }
+
   get station () {
     return this.stations[ this.currentStationIndex ];
   }
@@ -125,10 +154,6 @@ class HeadRadio extends HeadAudio {
 
   get currentStationIndex () {
     return this._currentStationIndex;
-  }
-
-  get hasStation ( index ) {
-    return Boolean( this.stations[ index ] );
   }
 
   set currentStationIndex ( index ) {

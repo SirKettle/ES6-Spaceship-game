@@ -3,6 +3,7 @@ import styles from './_Landing.scss';
 import React from 'react';
 import { Link } from 'react-router';
 import Footer from '../Footer/Footer.jsx';
+import RadioComponent from '../Radio/Radio.jsx';
 import MissionService from '../../services/Mission';
 
 export default class LandingComponent extends React.Component {
@@ -42,6 +43,7 @@ export default class LandingComponent extends React.Component {
         Landing page here...
         <h2>Missions</h2>
         { this.renderMissionLinks() }
+        <RadioComponent />
         <Footer />
       </div>
     );

@@ -8,6 +8,7 @@ import SpaceStation from '../../class/SpaceStation';
 import AiShip from '../../class/AiShip';
 import Ship from '../../class/Ship';
 import GameComponent from '../Game/Game';
+import RadioComponent from '../Radio/Radio';
 import KeyboardControls from '../../services/KeyboardControls';
 import KeyboardActions from '../../services/KeyboardActions';
 import MissionService from '../../services/Mission';
@@ -130,14 +131,14 @@ export default class MissionComponent extends React.Component {
     };
 
     if ( this.mission.actors.length < this.mission.settings.maxEnemies ) {
-      
-      gameUtils.doProbablyPerSeconds( delta, 20, () => {
-        addActor( { type: 'alienClass1' } );
-      });
 
-      gameUtils.doProbablyPerSeconds( delta, 20, () => {
-        addActor( { type: 'alienClass2' } );
-      });
+      // gameUtils.doProbablyPerSeconds( delta, 20, () => {
+      //   addActor( { type: 'alienClass1' } );
+      // });
+
+      // gameUtils.doProbablyPerSeconds( delta, 20, () => {
+      //   addActor( { type: 'alienClass2' } );
+      // });
     }
 
     const playerShots = this.playerShip.state.shots; // .concat(blah.shots..)
@@ -318,8 +319,8 @@ export default class MissionComponent extends React.Component {
     };
 
     const canvasConfig = {
-      width: document.body.clientWidth,
-      height: document.body.clientHeight
+      width: document.body.clientWidth - 20,
+      height: document.body.clientHeight - 100
     };
 
     this.setState({
@@ -339,17 +340,6 @@ export default class MissionComponent extends React.Component {
     this.mission.actors = missionData.actors.map( ( data ) => {
       return this.getActorClass( data );
     });
-
-    // this.mission.otherShips = missionData.ships.map( ( ship ) => {
-    //   return new Ship(
-    //     canvasConfig,
-    //     Object.assign(
-    //       {},
-    //       configs[ ship.type ],
-    //       ship
-    //     )
-    //   );
-    // });
 
     this.gameClock = Game.Clock();
     this.gameClock.start();
@@ -373,7 +363,6 @@ export default class MissionComponent extends React.Component {
     this.setState({
       canvas: canvasConfig
     });
-
   }
 
   componentWillUnmount () {
@@ -425,6 +414,7 @@ export default class MissionComponent extends React.Component {
           canvas={ this.state.canvas }
           onCanvasClicked={ this.onCanvasClicked }
         />
+        <RadioComponent />
         <Footer />
       </div>
     );
