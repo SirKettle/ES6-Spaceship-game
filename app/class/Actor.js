@@ -60,6 +60,11 @@ class Actor {
       this._state.health = this._state.maxHealth;
     }
 
+    if ( anotherActor.power < 0 ) {
+      // gaining power
+      return;
+    }
+
     if ( this.state.health <= 0 ) {
       HeadSfx.play( SOUNDS.EXPLOSION, this.audioVolume );
     }

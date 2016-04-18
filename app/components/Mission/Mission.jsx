@@ -13,6 +13,7 @@ import KeyboardControls from '../../services/KeyboardControls';
 import KeyboardActions from '../../services/KeyboardActions';
 import MissionService from '../../services/Mission';
 import Game from '../../services/Game';
+import HeadRadio from '../../services/HeadRadio';
 import gameUtils from '../../util/game';
 
 import playerShipData from '../../data/playerShip.json';
@@ -69,7 +70,8 @@ export default class MissionComponent extends React.Component {
     score: {
       score: 0
     },
-    map: {}
+    map: {},
+    radioState: {}
   }
 
   subscriptions = []
@@ -132,13 +134,13 @@ export default class MissionComponent extends React.Component {
 
     if ( this.mission.actors.length < this.mission.settings.maxEnemies ) {
 
-      // gameUtils.doProbablyPerSeconds( delta, 20, () => {
-      //   addActor( { type: 'alienClass1' } );
-      // });
+      gameUtils.doProbablyPerSeconds( delta, 60, () => {
+        addActor( { type: 'alienClass1' } );
+      });
 
-      // gameUtils.doProbablyPerSeconds( delta, 20, () => {
-      //   addActor( { type: 'alienClass2' } );
-      // });
+      gameUtils.doProbablyPerSeconds( delta, 60, () => {
+        addActor( { type: 'alienClass2' } );
+      });
     }
 
     const playerShots = this.playerShip.state.shots; // .concat(blah.shots..)
@@ -215,8 +217,11 @@ export default class MissionComponent extends React.Component {
     const stats = [];
 
     stats.push({ label: 'Health', value: this.playerShip.health });
-    stats.push({ label: 'F.P.S.', value: this.gameClock.fps });
-    // stats.push({ label: 'delta', value: this.gameClock.delta });
+    stats.push({ label: 'F.P.S.', value: this.gameClock.fpsAverage });
+
+    if ( this.state.radioState ) {
+      stats.push({ label: 'Radio', value: this.state.radioState.text.summary });
+    }
 
     return stats;
   }
@@ -351,6 +356,12 @@ export default class MissionComponent extends React.Component {
     });
   }
 
+  onRadioUpdate = ( state ) => {
+    this.setState({
+      radioState: state
+    });
+  }
+
   // react core methods
 
   componentWillMount () {
@@ -363,6 +374,8 @@ export default class MissionComponent extends React.Component {
     this.setState({
       canvas: canvasConfig
     });
+
+    HeadRadio.subscribe( this.onRadioUpdate );
   }
 
   componentWillUnmount () {
@@ -370,6 +383,7 @@ export default class MissionComponent extends React.Component {
     this.gameClock.stop();
     this.gameClock = null;
 
+    HeadRadio.unsubscribe( this.onRadioUpdate );
 
     this.subscriptions.forEach( ( subscription) => {
       subscription.dispose();
@@ -414,7 +428,9 @@ export default class MissionComponent extends React.Component {
           canvas={ this.state.canvas }
           onCanvasClicked={ this.onCanvasClicked }
         />
-        <RadioComponent />
+        <RadioComponent
+          data={ this.state.radioState }
+        />
         <Footer />
       </div>
     );

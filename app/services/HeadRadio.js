@@ -19,6 +19,7 @@ class HeadRadio extends HeadAudio {
 
     super( 'HeadRadio', CHANNELS );
 
+    this.subscribers = [];
     this.stations = radioStations;
     this.selectStation( 0 );
     this.currentTrackIndex = 0;
@@ -26,6 +27,7 @@ class HeadRadio extends HeadAudio {
     this.currentChannel.addEventListener( 'ended', () => {
       this.playNextTrack();
     });
+
   }
 
   static getInstance () {
@@ -38,10 +40,30 @@ class HeadRadio extends HeadAudio {
     return HeadRadio.instance;
   }
 
+  subscribe ( subscription ) {
+    this.subscribers.push( subscription );
+    this.emitUpdate();
+  }
+
+  unsubscribe ( subscription ) {
+    const index = this.subscribers.indexOf( subscription );
+    if ( index !== -1 ) {
+      console.log('unsubscribed!!')
+      this.subscribers.splice( index, 1 );
+    }
+  }
+
+  emitUpdate () {
+    this.subscribers.forEach( ( subscription ) => {
+      subscription( this.state );
+    });
+  }
+
   playTrack () {
     const src = this.track.src;
-    const self = this;
     super.play( src );
+    console.log('playTrack');
+    this.emitUpdate();
   }
 
   playNextTrack () {
@@ -59,10 +81,12 @@ class HeadRadio extends HeadAudio {
     // get station
     // get src
     this.playTrack();
+    this.emitUpdate();
   }
 
   handlePowerOff () {
     this.pause();
+    this.emitUpdate();
   }
 
   // expose controls
@@ -105,6 +129,7 @@ class HeadRadio extends HeadAudio {
 
     this.stop();
     this.playTrack();
+    this.emitUpdate();
   }
 
   turnUp () {
@@ -137,11 +162,28 @@ class HeadRadio extends HeadAudio {
   }
 
   get state () {
-    return {
+    const state = {
       currentTrack: this.track,
       currentStation: this.station,
-      stations: this.stations
+      stations: this.stations,
+      isOn: this.isOn,
+      subscribers: this.subscribers,
+      text: {
+        station: null,
+        playing: null,
+        summary: null
+      }
+    };
+
+    if ( state.isOn ) {
+      state.text.station = state.currentStation.station;
+      state.text.playing = `${ state.currentTrack.title } by ${ state.currentTrack.artist }`;
+      state.text.summary = `${ state.text.station } - ${ state.text.playing }`;
+    } else {
+      state.text.summary = 'Off';
     }
+
+    return state;
   }
 
   get station () {

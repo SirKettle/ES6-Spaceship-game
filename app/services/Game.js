@@ -88,10 +88,20 @@ class GameClock {
       return this.delta && Math.floor(1000 / this.delta);
     }
 
+    get fpsAverage () {
+      GameClock.fpsTally += this.fps;
+      GameClock.fpsCheckCount += 1;
+      return Math.floor(GameClock.fpsTally / GameClock.fpsCheckCount);
+    }
+
     get isRunning () {
       return Boolean( this._isRunning );
     }
 }
+
+GameClock.fpsCheckCount = 0;
+GameClock.fpsTally = 0;
+
 
  const Game = {
  	Clock: ( delta ) => {

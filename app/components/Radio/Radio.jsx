@@ -5,11 +5,14 @@ import HeadRadio from '../../services/HeadRadio';
 
 export default class RadioComponent extends React.Component {
 
-  componentWillUnmount () {
-  }
-
-  componentDidMount () {
-    // HeadRadio.switchOn();
+  static propTypes = {
+    data: React.PropTypes.shape({
+      currentTrack: React.PropTypes.object,
+      currentStation: React.PropTypes.object,
+      stations: React.PropTypes.arrayOf(React.PropTypes.object),
+      isOn: React.PropTypes.bool,
+      subscribers: React.PropTypes.arrayOf(React.PropTypes.func)
+    })
   }
 
   onPowerClicked () {
@@ -44,9 +47,11 @@ export default class RadioComponent extends React.Component {
 
   render () {
 
+    const { data } = this.props;
+
     return (
       <div className={ styles.Radio }>
-        <button onClick={ this.onPowerClicked.bind(this) }>{ HeadRadio.isOn ? 'Switch off' : 'Switch on' }</button>
+        <button onClick={ this.onPowerClicked.bind(this) }>{ data && data.isOn ? 'Switch off' : 'Switch on' }</button>
         <button onClick={ this.onVolumeDecreaseClicked.bind(this) }>vol-</button>
         <button onClick={ this.onVolumeIncreaseClicked.bind(this) }>vol+</button>
         <button onClick={ this.onPrevStationClicked.bind(this) }>prev</button>

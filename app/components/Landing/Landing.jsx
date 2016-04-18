@@ -4,18 +4,31 @@ import React from 'react';
 import { Link } from 'react-router';
 import Footer from '../Footer/Footer.jsx';
 import RadioComponent from '../Radio/Radio.jsx';
+import HeadRadio from '../../services/HeadRadio';
 import MissionService from '../../services/Mission';
 
 export default class LandingComponent extends React.Component {
 
   state = {
-    missionKeys: MissionService.getKeys()
+    missionKeys: MissionService.getKeys(),
+    radioState: {}
+  }
+
+  componentWillMount () {
+    HeadRadio.subscribe( this.onRadioUpdate );
   }
 
   componentWillUnmount () {
+    HeadRadio.unsubscribe( this.onRadioUpdate );
   }
 
   componentDidMount () {
+  }
+
+  onRadioUpdate = ( state ) => {
+    this.setState({
+      radioState: state
+    });
   }
 
   deleteMissionClicked ( missionKey ) {
@@ -43,7 +56,9 @@ export default class LandingComponent extends React.Component {
         Landing page here...
         <h2>Missions</h2>
         { this.renderMissionLinks() }
-        <RadioComponent />
+        <RadioComponent 
+          data={ this.state.radioState }
+        />
         <Footer />
       </div>
     );
