@@ -242,7 +242,8 @@ export default class MissionComponent extends React.Component {
       otherShipsCoords = this.mission.actors.map( ( actor ) => {
         return {
           x: Math.floor( gameUtils.getXPositionOffset( actor.state, this.playerShip.state, mapCanvas ) * scaleFactor ),
-          y: Math.floor( gameUtils.getYPositionOffset( actor.state, this.playerShip.state, mapCanvas ) * scaleFactor )
+          y: Math.floor( gameUtils.getYPositionOffset( actor.state, this.playerShip.state, mapCanvas ) * scaleFactor ),
+          isFriendly: actor.state._class !== 'AiShip'
         }
       });
     }
