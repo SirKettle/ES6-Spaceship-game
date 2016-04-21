@@ -32,12 +32,6 @@ class HeadAudio {
       channelCount += 1;
     }
 
-    // get and set the master volume
-    if ( Store.has( this.masterVolumeStoreKey ) ) {
-      // if has volume stored - use it
-      this.masterVolume = Store.get( this.masterVolumeStoreKey );
-    }
-
     // get and set the volume
     if ( Store.has( this.volumeStoreKey ) ) {
       // if has volume stored - use it
@@ -125,12 +119,6 @@ class HeadAudio {
     return this.currentChannel;
   }
 
-  // Store keys for saving state
-  // Master volume: represents the volume of all audio
-  get masterVolumeStoreKey () {
-    return `_HeadAudio__master_volume`;
-  }
-
   // Volume: represents the volume of the class (ie HeadRadio)
   get volumeStoreKey () {
     return `${ this.storeKey }volume`;
@@ -166,11 +154,7 @@ class HeadAudio {
   }
 
   get masterVolume () {
-    if ( typeof this._masterVolume === 'undefined' ) {
-      return DEFAULT_MASTER_VOLUME;
-    }
-
-    return this._masterVolume;
+    return HeadAudio.masterVolume;
   }
 
   set masterVolume ( vol ) {
@@ -178,9 +162,9 @@ class HeadAudio {
       return;
     }
     // store volume
-    Store.set( this.masterVolumeStoreKey, vol );
+    Store.set( HeadAudio.masterVolumeStoreKey, vol );
     // set volumne
-    this._masterVolume = vol;
+    HeadAudio.masterVolume = vol;
     this.updateVolume();
     this.emitUpdate();
   }
@@ -194,5 +178,15 @@ class HeadAudio {
     return state;
   }
 }
+
+HeadAudio.masterVolume = DEFAULT_MASTER_VOLUME;
+HeadAudio.masterVolumeStoreKey = '_HeadAudio__master_volume';
+
+// get and set the master volume
+if ( Store.has( HeadAudio.masterVolumeStoreKey ) ) {
+  // if has volume stored - use it
+  HeadAudio.masterVolume = Store.get( HeadAudio.masterVolumeStoreKey );
+}
+
 
 export default HeadAudio;
