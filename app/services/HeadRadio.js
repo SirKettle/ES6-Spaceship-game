@@ -19,7 +19,6 @@ class HeadRadio extends HeadAudio {
 
     super( 'HeadRadio', CHANNELS );
 
-    this.subscribers = [];
     this.stations = radioStations;
     this.selectStation( 0 );
     this.currentTrackIndex = 0;
@@ -38,25 +37,6 @@ class HeadRadio extends HeadAudio {
     }
 
     return HeadRadio.instance;
-  }
-
-  subscribe ( subscription ) {
-    this.subscribers.push( subscription );
-    this.emitUpdate();
-  }
-
-  unsubscribe ( subscription ) {
-    const index = this.subscribers.indexOf( subscription );
-    if ( index !== -1 ) {
-      console.log('unsubscribed!!')
-      this.subscribers.splice( index, 1 );
-    }
-  }
-
-  emitUpdate () {
-    this.subscribers.forEach( ( subscription ) => {
-      subscription( this.state );
-    });
   }
 
   playTrack () {
@@ -172,7 +152,8 @@ class HeadRadio extends HeadAudio {
         station: null,
         playing: null,
         summary: null
-      }
+      },
+      volume: this.volume
     };
 
     if ( state.isOn ) {

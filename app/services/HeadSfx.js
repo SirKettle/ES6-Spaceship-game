@@ -16,7 +16,7 @@ class HeadSfx extends HeadAudio {
       return;
     }
 
-    super( 'HeadAudio', CHANNELS );
+    super( 'HeadSfx', CHANNELS );
 
     console.log(this.channels.length);
   }

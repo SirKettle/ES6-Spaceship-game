@@ -14,6 +14,8 @@ class HeadAudio {
 
   	// set the store key
     this.storeKey = `_${ name }__`;
+    
+    this.subscribers = [];
 
     // set up the channels
     this.channels = [];
@@ -59,6 +61,25 @@ class HeadAudio {
 
   isValidVolume ( vol ) {
     return validate.number.between( vol, 0, 1 );
+  }
+
+  subscribe ( subscription ) {
+    this.subscribers.push( subscription );
+    this.emitUpdate();
+  }
+
+  unsubscribe ( subscription ) {
+    const index = this.subscribers.indexOf( subscription );
+    if ( index !== -1 ) {
+      console.log('unsubscribed!!')
+      this.subscribers.splice( index, 1 );
+    }
+  }
+
+  emitUpdate () {
+    this.subscribers.forEach( ( subscription ) => {
+      subscription( this.state );
+    });
   }
 
   get currentChannel () {
@@ -111,6 +132,7 @@ class HeadAudio {
     Store.set( this.volumeStoreKey, vol );
     // set volumne
     this._volume = vol;
+    this.emitUpdate();
   }
 
   get masterVolume () {
@@ -129,6 +151,16 @@ class HeadAudio {
     Store.set( this.masterVolumeStoreKey, vol );
     // set volumne
     this._masterVolume = vol;
+    this.emitUpdate();
+  }
+
+  get state () {
+    const state = {
+      volume: this.volume,
+      masterVolume: this.masterVolume
+    };
+
+    return state;
   }
 }
 
