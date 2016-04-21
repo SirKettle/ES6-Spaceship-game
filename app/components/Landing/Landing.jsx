@@ -4,6 +4,7 @@ import React from 'react';
 import { Link } from 'react-router';
 import Footer from '../Footer/Footer.jsx';
 import RadioComponent from '../Radio/Radio.jsx';
+import SettingsComponent from '../Settings/Settings.jsx';
 import HeadRadio from '../../services/HeadRadio';
 import MissionService from '../../services/Mission';
 
@@ -56,6 +57,7 @@ export default class LandingComponent extends React.Component {
         Landing page here...
         <h2>Missions</h2>
         { this.renderMissionLinks() }
+        <SettingsComponent />
         <RadioComponent 
           data={ this.state.radioState }
         />
