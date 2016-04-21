@@ -37,7 +37,8 @@ const canvasUtils = {
   },
 
   drawMap: ( ctx, map ) => {
-    const shipColor = 'rgba( 250, 200, 100, 1)';
+    const shipColor = 'rgba( 250, 100, 100, 1)';
+    const friendlyColor = 'rgba( 250, 200, 100, 1)';
     ctx.strokeStyle = 'rgba( 250, 200, 100, 1)';
     ctx.strokeRect( 0, 0, map.width, map.height);
 
@@ -45,7 +46,9 @@ const canvasUtils = {
     canvasUtils.drawCircle( ctx, map.width * 0.5, map.height * 0.5, 2, '#ffffff' );
 
     (map.ships || []).forEach( ( ship ) => {
-        canvasUtils.drawCircle( ctx, ship.x, ship.y, 2, shipColor );
+        const color = ship.isFriendly ? friendlyColor : shipColor;
+        // canvasUtils.drawCircle( ctx, ship.x, ship.y, 2, color );
+        canvasUtils.drawRect( ctx, ship.x, ship.y, 3, color );
     });
   },
 
@@ -63,6 +66,12 @@ const canvasUtils = {
   drawShot: ( canvas, ctx, x, y, direction, size = 10, opacity = 1 ) => {
     const color = `rgba( 0, 255, 0, ${opacity}`;
     canvasUtils.drawCircle( ctx, x, y, size, color );
+  },
+
+  drawRect: ( ctx, x, y, size, color = '#000000' ) => {
+    //draw a circle
+    ctx.fillStyle = color;
+    ctx.fillRect( x, y, size, size );
   },
 
   drawCircle: ( ctx, x, y, size, color = '#000000' ) => {
