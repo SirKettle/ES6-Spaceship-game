@@ -48,27 +48,27 @@ export default class SettingsComponent extends React.Component {
   }
 
   increaseMasterVolumeClicked () {
-    HeadSfx.masterVolume = HeadSfx.masterVolume + 0.1;
+    HeadSfx.turnUpMaster();
   }
 
   decreaseMasterVolumeClicked () {
-    HeadSfx.masterVolume = HeadSfx.masterVolume - 0.1;
+    HeadSfx.turnDownMaster();
   }
 
   increaseSfxVolumeClicked () {
-    HeadSfx.volume = HeadSfx.volume + 0.1;
+    HeadSfx.turnUp();
   }
 
   decreaseSfxVolumeClicked () {
-    HeadSfx.volume = HeadSfx.volume - 0.1;
+    HeadSfx.turnDown();
   }
 
   increaseRadioVolumeClicked () {
-    HeadRadio.volume = HeadRadio.volume + 0.1;
+    HeadRadio.turnUp();
   }
 
   decreaseRadioVolumeClicked () {
-    HeadRadio.volume = HeadRadio.volume - 0.1;
+    HeadRadio.turnDown();
   }
 
   render () {

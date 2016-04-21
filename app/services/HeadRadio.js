@@ -23,7 +23,7 @@ class HeadRadio extends HeadAudio {
     this.selectStation( 0 );
     this.currentTrackIndex = 0;
     this.isOn = false;
-    this.currentChannel.addEventListener( 'ended', () => {
+    this.currentChannel.audio.addEventListener( 'ended', () => {
       this.playNextTrack();
     });
 
@@ -48,7 +48,7 @@ class HeadRadio extends HeadAudio {
 
   playNextTrack () {
     console.log('play next track');
-    
+
     let nextTrackIndex = this.currentTrackIndex + 1;
     if ( !this.station.tracks[ nextTrackIndex ] ) {
       nextTrackIndex = 0;
@@ -110,14 +110,6 @@ class HeadRadio extends HeadAudio {
     this.stop();
     this.playTrack();
     this.emitUpdate();
-  }
-
-  turnUp () {
-    console.log('turn up radio vol');
-  }
-
-  turnDown () {
-    console.log('turn down radio vol');
   }
 
   hasStation ( index ) {

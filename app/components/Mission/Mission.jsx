@@ -8,12 +8,11 @@ import SpaceStation from '../../class/SpaceStation';
 import AiShip from '../../class/AiShip';
 import Ship from '../../class/Ship';
 import GameComponent from '../Game/Game';
-import RadioComponent from '../Radio/Radio';
+import DashboardComponent from '../Dashboard/Dashboard';
 import KeyboardControls from '../../services/KeyboardControls';
 import KeyboardActions from '../../services/KeyboardActions';
 import MissionService from '../../services/Mission';
 import Game from '../../services/Game';
-import HeadRadio from '../../services/HeadRadio';
 import gameUtils from '../../util/game';
 
 import playerShipData from '../../data/playerShip.json';
@@ -70,8 +69,7 @@ export default class MissionComponent extends React.Component {
     score: {
       score: 0
     },
-    map: {},
-    radioState: {}
+    map: {}
   }
 
   subscriptions = []
@@ -219,9 +217,6 @@ export default class MissionComponent extends React.Component {
     stats.push({ label: 'Health', value: this.playerShip.health });
     stats.push({ label: 'F.P.S.', value: this.gameClock.fpsAverage });
 
-    if ( this.state.radioState ) {
-      stats.push({ label: 'Radio', value: this.state.radioState.text.summary });
-    }
 
     return stats;
   }
@@ -357,12 +352,6 @@ export default class MissionComponent extends React.Component {
     });
   }
 
-  onRadioUpdate = ( state ) => {
-    this.setState({
-      radioState: state
-    });
-  }
-
   // react core methods
 
   componentWillMount () {
@@ -375,16 +364,12 @@ export default class MissionComponent extends React.Component {
     this.setState({
       canvas: canvasConfig
     });
-
-    HeadRadio.subscribe( this.onRadioUpdate );
   }
 
   componentWillUnmount () {
 
     this.gameClock.stop();
     this.gameClock = null;
-
-    HeadRadio.unsubscribe( this.onRadioUpdate );
 
     this.subscriptions.forEach( ( subscription) => {
       subscription.dispose();
@@ -429,9 +414,7 @@ export default class MissionComponent extends React.Component {
           canvas={ this.state.canvas }
           onCanvasClicked={ this.onCanvasClicked }
         />
-        <RadioComponent
-          data={ this.state.radioState }
-        />
+        <Dashboard />
         <Footer />
       </div>
     );

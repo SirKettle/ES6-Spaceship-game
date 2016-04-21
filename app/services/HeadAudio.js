@@ -1,6 +1,7 @@
 
 import Store from './Storage';
 import validate from '../util/validate';
+import numberUtils from '../util/number';
 
 const DEFAULT_MASTER_VOLUME = 0.5;
 
@@ -14,7 +15,7 @@ class HeadAudio {
 
   	// set the store key
     this.storeKey = `_${ name }__`;
-    
+
     this.subscribers = [];
 
     // set up the channels
@@ -24,7 +25,10 @@ class HeadAudio {
     let channelCount = 0;
 
     while ( channelCount < channels ) {
-      this.channels.push( document.createElement('audio') );
+      this.channels.push({
+        audio: document.createElement('audio'),
+        volume: 0
+      });
       channelCount += 1;
     }
 
@@ -41,22 +45,31 @@ class HeadAudio {
     }
   }
 
+  updateVolume () {
+    this.channels.forEach( ( channel ) => {
+      if ( typeof channel.audio === 'object' ) {
+        channel.audio.volume = Math.min( 1, Math.max( 0, channel.volume * this.volume * this.masterVolume ) );
+      }
+    });
+  }
+
   play ( src, volume = 1 ) {
     const channel = this.nextChannel;
-    channel.src = src;
-    channel.volume = Math.min( 1, Math.max( 0, volume * this.volume * this.masterVolume ) );
-    channel.play();
+    channel.volume = volume;
+    channel.audio.src = src;
+    channel.audio.play();
+    this.updateVolume();
   }
 
   pause () {
   	const channel = this.currentChannel;
-    channel.pause();
+    channel.audio.pause();
   }
 
   stop () {
     const channel = this.currentChannel;
-    channel.pause();
-    channel.src = '';
+    channel.audio.pause();
+    channel.audio.src = '';
   }
 
   isValidVolume ( vol ) {
@@ -80,6 +93,22 @@ class HeadAudio {
     this.subscribers.forEach( ( subscription ) => {
       subscription( this.state );
     });
+  }
+
+  turnUp ( by = 0.1 ) {
+    this.volume = numberUtils.safeIncrementBy( this.volume, by );
+  }
+
+  turnDown ( by = 0.1 ) {
+    this.volume = numberUtils.safeIncrementBy( this.volume, -by );
+  }
+
+  turnUpMaster ( by = 0.1 ) {
+    this.masterVolume = numberUtils.safeIncrementBy( this.masterVolume, by );
+  }
+
+  turnDownMaster ( by = 0.1 ) {
+    this.masterVolume = numberUtils.safeIncrementBy( this.masterVolume, -by );
   }
 
   get currentChannel () {
@@ -132,6 +161,7 @@ class HeadAudio {
     Store.set( this.volumeStoreKey, vol );
     // set volumne
     this._volume = vol;
+    this.updateVolume();
     this.emitUpdate();
   }
 
@@ -151,6 +181,7 @@ class HeadAudio {
     Store.set( this.masterVolumeStoreKey, vol );
     // set volumne
     this._masterVolume = vol;
+    this.updateVolume();
     this.emitUpdate();
   }
 
