@@ -42,7 +42,12 @@ class HeadAudio {
   updateVolume () {
     this.channels.forEach( ( channel ) => {
       if ( typeof channel.audio === 'object' ) {
-        channel.audio.volume = Math.min( 1, Math.max( 0, channel.volume * this.volume * this.masterVolume ) );
+        if ( this.mute ) {
+          channel.audio.volume = 0;
+        }
+        else {
+          channel.audio.volume = Math.min( 1, Math.max( 0, channel.volume * this.volume * this.masterVolume ) );
+        }
       }
     });
   }
@@ -133,6 +138,19 @@ class HeadAudio {
     this._storeKey = key;
   }
 
+  get mute () {
+    return HeadAudio.mute;
+  }
+
+  set mute ( isMute = true ) {
+    // store mute
+    Store.set( HeadAudio.muteStoreKey, isMute );
+    // set mute
+    HeadAudio.mute = isMute;
+    this.updateVolume();
+    this.emitUpdate();
+  }
+
   get volume () {
     if ( typeof this._volume === 'undefined' ) {
       return 1;
@@ -179,8 +197,16 @@ class HeadAudio {
   }
 }
 
+HeadAudio.mute = false;
+HeadAudio.muteStoreKey = '_HeadAudio__mute';
 HeadAudio.masterVolume = DEFAULT_MASTER_VOLUME;
 HeadAudio.masterVolumeStoreKey = '_HeadAudio__master_volume';
+
+// get and set the master volume
+if ( Store.has( HeadAudio.muteStoreKey ) ) {
+  // if has volume stored - use it
+  HeadAudio.mute = Store.get( HeadAudio.muteStoreKey );
+}
 
 // get and set the master volume
 if ( Store.has( HeadAudio.masterVolumeStoreKey ) ) {
