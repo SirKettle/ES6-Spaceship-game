@@ -14,6 +14,7 @@ import KeyboardActions from '../../services/KeyboardActions';
 import MissionService from '../../services/Mission';
 import Game from '../../services/Game';
 import gameUtils from '../../util/game';
+import numberUtils from '../../util/number';
 
 import playerShipData from '../../data/playerShip.json';
 import harrisonShipData from '../../data/harrisonShip.json';
@@ -214,7 +215,15 @@ export default class MissionComponent extends React.Component {
   getStats () {
     const stats = [];
 
-    stats.push({ label: 'Health', value: this.playerShip.health });
+    // stats.push({ label: 'Health', value: numberUtils.toPrecision( this.playerShip.health, 3 ) });
+    stats.push({ label: 'Health', value: numberUtils.toPrecision( this.playerShip.health, 3 ) });
+    stats.push({ label: 'UFOs', value: this.mission.actors.length });
+    stats.push({ label: 'Enemy shots', value: this.state.shots.length - this.playerShip.state.shots.length });
+    stats.push({ label: 'Friendly shots', value: this.playerShip.state.shots.length });
+    stats.push({ label: 'Speed', value: numberUtils.toPrecision( this.playerShip.state.speed, 1 ) });
+    stats.push({ label: 'Heading', value: numberUtils.toPrecision( this.playerShip.state.direction, 2 ) });
+    stats.push({ label: 'Longitude', value: numberUtils.toPrecision( this.playerShip.circle.y, 1 ) });
+    stats.push({ label: 'Latitude', value: numberUtils.toPrecision( this.playerShip.circle.x, 1 ) });
     stats.push({ label: 'F.P.S.', value: this.gameClock.fpsAverage });
 
 
@@ -412,7 +421,6 @@ export default class MissionComponent extends React.Component {
           playerShip={ this.state.playerShip }
           actors={ this.state.actors }
           shots={ this.state.shots }
-          stats={ this.state.stats }
           score={ this.state.score }
           map={ this.state.map }
           showGuides={ this.state.showGuides }
@@ -420,7 +428,9 @@ export default class MissionComponent extends React.Component {
           canvas={ this.state.canvas }
           onCanvasClicked={ this.onCanvasClicked }
         />
-        <DashboardComponent />
+        <DashboardComponent
+          stats={ this.state.stats }
+        />
         <Footer />
       </div>
     );

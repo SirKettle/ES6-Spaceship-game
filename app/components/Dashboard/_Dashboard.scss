@@ -1,10 +1,33 @@
 @import "toolkit";
 
-.Dashboard {
+.dashboard {
 	position: absolute;
 	left: 0; right: 0; bottom: 0;
 	height: 211px;
 	background-size: contain;
 	z-index: 5;
 	pointer-events: none;
+}
+
+
+.stats {
+	position: absolute;
+	bottom: 250px; left: 20px;
+	z-index: 5;
+	color: rgba(50, 255, 50, 1);
+	font-family: monospace;
+	font-size: 13px;
+	pointer-events: none;
+	opacity: 0.5;
+
+	th, td {
+		text-align: left;
+		padding: 3px 0;
+	    line-height: 25px;
+	}
+
+	th {
+		font-weight: bold;
+		padding-right: 10px;
+	}
 }

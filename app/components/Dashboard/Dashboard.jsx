@@ -9,6 +9,14 @@ require('file?!../../assets/dash.png');
 
 export default class DashboardComponent extends React.Component {
 
+  static propTypes = {
+    stats: React.PropTypes.arrayOf(React.PropTypes.object)
+  }
+
+  static defaultProps = {
+    stats: []
+  }
+
   state = {
     radioState: {}
   }
@@ -29,10 +37,18 @@ export default class DashboardComponent extends React.Component {
     HeadRadio.unsubscribe( this.onRadioUpdate );
   }
 
+  renderStats() {
+    return this.props.stats.map( ( stat ) => {
+      return (
+        <tr key={ stat.label }><th>{ stat.label }</th><td>{ stat.value }</td></tr>
+      );
+    });
+  }
+
   render () {
 
     return (
-      <div className={ styles.Dashboard }
+      <div className={ styles.dashboard }
         style={
           {
             backgroundImage: 'url(../../assets/dash.png)'
@@ -40,6 +56,13 @@ export default class DashboardComponent extends React.Component {
         }
       >
         <RadioComponent data={ this.state.radioState } />
+
+        <table className={ styles.stats }>
+          <tbody>
+            { this.renderStats() }
+          </tbody>
+        </table>
+
         <SettingsComponent />
       </div>
     );

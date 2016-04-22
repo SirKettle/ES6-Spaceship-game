@@ -40,13 +40,12 @@ const canvasUtils = {
     const shipColor = 'rgba( 250, 100, 100, 1)';
     const friendlyColor = 'rgba( 250, 200, 100, 1)';
 
-    canvasUtils.drawHoop( ctx, map.width * 0.5, map.height * 0.5, 30, '#ffffff' );
     canvasUtils.drawCircle( ctx, map.width * 0.5, map.height * 0.5, 2, '#ffffff' );
 
     (map.ships || []).forEach( ( ship ) => {
         const color = ship.isFriendly ? friendlyColor : shipColor;
         // canvasUtils.drawCircle( ctx, ship.x, ship.y, 2, color );
-        canvasUtils.drawRect( ctx, ship.x, ship.y, 3, color );
+        canvasUtils.drawRect( ctx, ship.x, ship.y, 4, color );
     });
   },
 

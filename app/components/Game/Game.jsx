@@ -22,7 +22,6 @@ export default class GameComponent extends React.Component {
     playerShip: React.PropTypes.object,
     actors: React.PropTypes.arrayOf(React.PropTypes.object),
     shots: React.PropTypes.arrayOf(React.PropTypes.object),
-    stats: React.PropTypes.arrayOf(React.PropTypes.object),
     score: React.PropTypes.object,
     showGuides: React.PropTypes.bool,
     showMap: React.PropTypes.bool,
@@ -101,9 +100,6 @@ export default class GameComponent extends React.Component {
 
     // Draw our player spaceship
     canvasUtils.drawThing( ctx, playerShip, getXPositionOffset( playerShip, playerShip ), getYPositionOffset( playerShip, playerShip ), showGuides );
-
-    // TODO: replace this with a simple div for performance
-    this.paintScore( ctx );
   }
 
   renderMapCanvas = ( ctx ) => {
@@ -123,13 +119,6 @@ export default class GameComponent extends React.Component {
     // ie,
     // 1st layer - dust clouds, junk etc - moving at same speed
     // 2nd layer - middle distance - moons, planets, stars etc - moving at 1/3 speed
-  }
-
-  paintScore ( ctx ) {
-    const { score, playerShip, shots } = this.props;
-    ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 26px sans-serif';
-    ctx.fillText( parseInt(playerShip.x) + ' by ' + parseInt(playerShip.y) + ' - px/s: ' + parseInt(playerShip.speed) + ' - SHOTS: ' + shots.length, 40, 43);
   }
 
   componentDidMount() {
@@ -167,14 +156,6 @@ export default class GameComponent extends React.Component {
     this.renderScene();
   }
 
-  renderStats() {
-    return this.props.stats.map( ( stat ) => {
-      return (
-        <tr key={ stat.label }><th>{ stat.label }</th><td>{ stat.value }</td></tr>
-      );
-    });
-  }
-
   getBackgroundPosition ( factor = 0.2 ) {
     const { playerShip } = this.props;
 
@@ -195,11 +176,6 @@ export default class GameComponent extends React.Component {
       <div className={ styles.Game }
         style={ inlineStyles }
       >
-        <table className={ styles.Stats }>
-          <tbody>
-            { this.renderStats() }
-          </tbody>
-        </table>
 
         <canvas ref="mapCanvas"
           className={ styles.CanvasMap }
