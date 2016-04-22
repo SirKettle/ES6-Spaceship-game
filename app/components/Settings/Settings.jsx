@@ -71,6 +71,14 @@ export default class SettingsComponent extends React.Component {
     HeadRadio.turnDown();
   }
 
+  isMute () {
+    return HeadSfx.mute;
+  }
+
+  onMuteCheckChanged () {
+    HeadSfx.mute = !HeadSfx.mute;
+  }
+
   render () {
 
     return (
@@ -80,6 +88,13 @@ export default class SettingsComponent extends React.Component {
 
         <h3>Master Volume</h3>
         <p>
+          <label>
+            Mute:
+            <input type="checkbox"
+              checked={ this.isMute() }
+              onChange={ this.onMuteCheckChanged.bind( this ) }
+            />
+          </label>
           <button onClick={ this.increaseMasterVolumeClicked.bind( this ) }>Vol+</button>
           <button onClick={ this.decreaseMasterVolumeClicked.bind( this ) }>Vol-</button>
           - { this.getMasterVolume() }
