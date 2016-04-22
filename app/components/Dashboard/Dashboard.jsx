@@ -18,13 +18,23 @@ export default class DashboardComponent extends React.Component {
   }
 
   state = {
-    radioState: {}
+    radioState: {},
+    settingsVisible: false
   }
 
   onRadioUpdate = ( state ) => {
     this.setState({
       radioState: state
     });
+  }
+
+  onToggleSettingsClicked () {
+
+    console.log('Need to pause game??');
+
+    this.setState({
+      settingsVisible: !this.state.settingsVisible
+    })
   }
 
   // react core methods
@@ -37,7 +47,7 @@ export default class DashboardComponent extends React.Component {
     HeadRadio.unsubscribe( this.onRadioUpdate );
   }
 
-  renderStats() {
+  renderStats () {
     return this.props.stats.map( ( stat ) => {
       return (
         <tr key={ stat.label }><th>{ stat.label }</th><td>{ stat.value }</td></tr>
@@ -45,16 +55,23 @@ export default class DashboardComponent extends React.Component {
     });
   }
 
+  renderSettings () {
+    if ( !this.state.settingsVisible ) {
+      return;
+    }
+
+    return (
+      <SettingsComponent />
+    );
+  }
+
   render () {
 
     return (
-      <div className={ styles.dashboard }
-        style={
-          {
-            backgroundImage: 'url(../../assets/dash.png)'
-          }
-        }
-      >
+      <div className={ styles.dashboard }>
+
+        <div className={ styles.dash } style={ { backgroundImage: 'url(../../assets/dash.png)' } } />
+
         <RadioComponent data={ this.state.radioState } />
 
         <table className={ styles.stats }>
@@ -63,7 +80,12 @@ export default class DashboardComponent extends React.Component {
           </tbody>
         </table>
 
-        <SettingsComponent />
+        <button
+          onClick={ this.onToggleSettingsClicked.bind( this ) }
+        >Settings</button>
+
+        { this.renderSettings() }
+
       </div>
     );
   }

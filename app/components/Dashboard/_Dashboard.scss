@@ -4,16 +4,22 @@
 	position: absolute;
 	left: 0; right: 0; bottom: 0;
 	height: 211px;
-	background-size: contain;
 	z-index: 5;
 	pointer-events: none;
 }
 
 
+.dash {
+	position: absolute;
+	z-index: 2;
+	left: 0; right: 0; bottom: 0;
+	background-size: contain;
+}
+
 .stats {
 	position: absolute;
 	bottom: 250px; left: 20px;
-	z-index: 5;
+	z-index: 1;
 	color: rgba(50, 255, 50, 1);
 	font-family: monospace;
 	font-size: 13px;
