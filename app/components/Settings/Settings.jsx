@@ -7,6 +7,14 @@ import HeadSfx from '../../services/HeadSfx';
 
 export default class SettingsComponent extends React.Component {
 
+  static propTypes = {
+      onCloseRequested: React.PropTypes.func
+  }
+
+  static defaultProps = {
+    onCloseRequested: () => {}
+  }
+
   state = {
     sfxState: {},
     radioState: {}
@@ -74,7 +82,11 @@ export default class SettingsComponent extends React.Component {
   render () {
 
     return (
-      <div className={ styles.Settings }>
+      <div className={ styles.settings }>
+        <button
+          className={ styles.closeButton }
+          onClick={ this.props.onCloseRequested }
+        >X</button>
         <h2>Settings</h2>
         <p>Volume (master and sfx)</p>
 

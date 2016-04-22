@@ -38,7 +38,6 @@ export default class LandingComponent extends React.Component {
         <h2>Missions</h2>
         { this.renderMissionLinks() }
         <DashboardComponent />
-        <Footer />
       </div>
     );
   }

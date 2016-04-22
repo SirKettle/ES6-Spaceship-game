@@ -27,6 +27,10 @@ export default class DashboardComponent extends React.Component {
     });
   }
 
+  onToggleSettingsClicked () {
+    console.log('clicked');
+  }
+
   // react core methods
 
   componentWillMount () {
@@ -63,7 +67,9 @@ export default class DashboardComponent extends React.Component {
           </tbody>
         </table>
 
-        <SettingsComponent />
+        <SettingsComponent
+          onCloseRequested={ this.onToggleSettingsClicked }
+        />
       </div>
     );
   }

@@ -431,7 +431,6 @@ export default class MissionComponent extends React.Component {
         <DashboardComponent
           stats={ this.state.stats }
         />
-        <Footer />
       </div>
     );
   }
