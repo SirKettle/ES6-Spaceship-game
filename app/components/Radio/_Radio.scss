@@ -1,9 +1,58 @@
 @import "toolkit";
 
-.Radio {
+.radio {
 	display: block;
+	pointer-events: auto;
+	position: absolute;
+	bottom: 0;
+	left: 50%;
+	margin-left: -222px;
+	width: 458px;
+	height: 60px;
 
 	button {
 		
 	}
+
+	p {
+	}
+}
+
+.controls {
+	position: absolute;
+	top: -42px;
+	left: 67px;
+	right: 0;
+
+	button {
+		margin-right: 5px;
+		background-color: #222;
+		color: white;
+		border: solid 2px rgba(255,255,255, 0.2);
+		border-radius: 50%;
+		width: 40px;
+		height: 40px;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+
+		&:focus {
+			outline: none;
+			box-shadow: none;
+			border-color: rgba(50, 255, 50, 0.3);
+		}
+
+		&:hover {
+			outline: none;
+			box-shadow: none;
+			border-color: rgba(50, 255, 50, 1);
+		}
+	}
+}
+
+.display {
+	padding: 10px 88px 0 78px;
+	color: rgba(50, 255, 50, 1);
+	font-family: monospace;
+	font-size: 13px;
 }

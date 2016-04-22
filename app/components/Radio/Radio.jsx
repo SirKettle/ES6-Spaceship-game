@@ -11,38 +11,42 @@ export default class RadioComponent extends React.Component {
       currentStation: React.PropTypes.object,
       stations: React.PropTypes.arrayOf(React.PropTypes.object),
       isOn: React.PropTypes.bool,
-      subscribers: React.PropTypes.arrayOf(React.PropTypes.func)
+      subscribers: React.PropTypes.arrayOf(React.PropTypes.func),
+      text: React.PropTypes.shape({
+        station: React.PropTypes.string,
+        playing: React.PropTypes.string,
+        summary: React.PropTypes.string
+      }),
+      volume: React.PropTypes.number
     })
   }
 
   onPowerClicked () {
     HeadRadio.togglePower();
-    const state = HeadRadio.state;
-    console.log( state );
   }
 
   onVolumeDecreaseClicked () {
     HeadRadio.turnDown();
-    const state = HeadRadio.state;
-    console.log( state );
   }
 
   onVolumeIncreaseClicked () {
     HeadRadio.turnUp();
-    const state = HeadRadio.state;
-    console.log( state );
+  }
+
+  onPrevTrackClicked () {
+    HeadRadio.prevTrack();
+  }
+
+  onNextTrackClicked () {
+    HeadRadio.nextTrack();
   }
 
   onPrevStationClicked () {
     HeadRadio.prevStation();
-    const state = HeadRadio.state;
-    console.log( state );
   }
 
   onNextStationClicked () {
     HeadRadio.nextStation();
-    const state = HeadRadio.state;
-    console.log( state );
   }
 
   render () {
@@ -50,12 +54,17 @@ export default class RadioComponent extends React.Component {
     const { data } = this.props;
 
     return (
-      <div className={ styles.Radio }>
-        <button onClick={ this.onPowerClicked.bind(this) }>{ data && data.isOn ? 'Switch off' : 'Switch on' }</button>
-        <button onClick={ this.onVolumeDecreaseClicked.bind(this) }>vol-</button>
-        <button onClick={ this.onVolumeIncreaseClicked.bind(this) }>vol+</button>
-        <button onClick={ this.onPrevStationClicked.bind(this) }>prev</button>
-        <button onClick={ this.onNextStationClicked.bind(this) }>next-</button>
+      <div className={ styles.radio }>
+        <div className={ styles.controls }>
+          <button className="power" onClick={ this.onPowerClicked.bind(this) }>{ data && data.isOn ? 'Switch off' : 'Switch on' }</button>
+          <button className="volume-dec" onClick={ this.onVolumeDecreaseClicked.bind(this) }>vol-</button>
+          <button className="volume-inc" onClick={ this.onVolumeIncreaseClicked.bind(this) }>vol+</button>
+          <button className="track-prev" onClick={ this.onPrevTrackClicked.bind(this) }>Tr-</button>
+          <button className="track-next" onClick={ this.onNextTrackClicked.bind(this) }>Tr+</button>
+          <button className="station-prev" onClick={ this.onPrevStationClicked.bind(this) }>Ch-</button>
+          <button className="station-next" onClick={ this.onNextStationClicked.bind(this) }>Ch+</button>
+        </div>
+        <div className={ styles.display }>{ data.text.summary }</div>
       </div>
     );
   }

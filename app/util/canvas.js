@@ -39,8 +39,6 @@ const canvasUtils = {
   drawMap: ( ctx, map ) => {
     const shipColor = 'rgba( 250, 100, 100, 1)';
     const friendlyColor = 'rgba( 250, 200, 100, 1)';
-    ctx.strokeStyle = 'rgba( 250, 200, 100, 1)';
-    ctx.strokeRect( 0, 0, map.width, map.height);
 
     canvasUtils.drawHoop( ctx, map.width * 0.5, map.height * 0.5, 30, '#ffffff' );
     canvasUtils.drawCircle( ctx, map.width * 0.5, map.height * 0.5, 2, '#ffffff' );

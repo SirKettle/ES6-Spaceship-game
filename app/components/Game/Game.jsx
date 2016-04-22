@@ -155,10 +155,10 @@ export default class GameComponent extends React.Component {
   }
 
   renderScene ( canvases ) {
-    this.renderGameCanvas( this.contexts.game );
-    this.renderMapCanvas( this.contexts.map );
     this.renderSceneryCanvas( this.contexts.scenery );
+    this.renderMapCanvas( this.contexts.map );
     // could add many levels of this
+    this.renderGameCanvas( this.contexts.game );
     this.renderParallax( this.contexts.parallaxForeground, 0.5, this.parallaxCoords[0], 0.9 );
     this.renderParallax( this.contexts.parallaxBackground, 0.1, this.parallaxCoords[1], 0.6 );
   }

@@ -248,6 +248,8 @@ export default class MissionComponent extends React.Component {
       ships: otherShipsCoords,
       width: Math.floor( mapCanvas.width * scaleFactor ),
       height: Math.floor( mapCanvas.height * scaleFactor )
+      // width: 305,
+      // height: 160
     };
   }
 
@@ -320,8 +322,10 @@ export default class MissionComponent extends React.Component {
     };
 
     const canvasConfig = {
-      width: document.body.clientWidth - 20,
-      height: document.body.clientHeight - 100
+      // width: document.body.clientWidth - 20,
+      // height: document.body.clientHeight - 20
+      width: 1024,
+      height: 768
     };
 
     this.setState({
@@ -357,8 +361,10 @@ export default class MissionComponent extends React.Component {
   componentWillMount () {
 
     const canvasConfig = {
-      width: document.body.clientWidth,
-      height: document.body.clientHeight
+      // width: document.body.clientWidth,
+      // height: document.body.clientHeight
+      width: 1024,
+      height: 768
     };
 
     this.setState({
@@ -414,7 +420,7 @@ export default class MissionComponent extends React.Component {
           canvas={ this.state.canvas }
           onCanvasClicked={ this.onCanvasClicked }
         />
-        <Dashboard />
+        <DashboardComponent />
         <Footer />
       </div>
     );

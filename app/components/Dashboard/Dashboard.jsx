@@ -5,6 +5,8 @@ import SettingsComponent from '../Settings/Settings.jsx';
 import RadioComponent from '../Radio/Radio';
 import HeadRadio from '../../services/HeadRadio';
 
+require('file?!../../assets/dash.png');
+
 export default class DashboardComponent extends React.Component {
 
   state = {
@@ -30,7 +32,13 @@ export default class DashboardComponent extends React.Component {
   render () {
 
     return (
-      <div className={ styles.Dashboard }>
+      <div className={ styles.Dashboard }
+        style={
+          {
+            backgroundImage: 'url(../../assets/dash.png)'
+          }
+        }
+      >
         <RadioComponent data={ this.state.radioState } />
         <SettingsComponent />
       </div>

@@ -1,7 +1,12 @@
 @import "toolkit";
 
 .Mission {
-  font-size: inherit;
+	font-size: inherit;
+	width: 1024px;
+	height: 768px;
+	margin: auto;
+	position: relative;
+	box-sizing: border-box;
 }
 
 .Pause {

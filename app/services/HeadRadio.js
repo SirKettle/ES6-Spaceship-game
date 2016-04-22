@@ -24,7 +24,7 @@ class HeadRadio extends HeadAudio {
     this.currentTrackIndex = 0;
     this.isOn = false;
     this.currentChannel.audio.addEventListener( 'ended', () => {
-      this.playNextTrack();
+      this.nextTrack();
     });
 
   }
@@ -44,17 +44,6 @@ class HeadRadio extends HeadAudio {
     super.play( src );
     console.log('playTrack');
     this.emitUpdate();
-  }
-
-  playNextTrack () {
-    console.log('play next track');
-
-    let nextTrackIndex = this.currentTrackIndex + 1;
-    if ( !this.station.tracks[ nextTrackIndex ] ) {
-      nextTrackIndex = 0;
-    }
-    this.currentTrackIndex = nextTrackIndex;
-    this.playTrack();
   }
 
   handlePowerOn () {
@@ -80,6 +69,36 @@ class HeadRadio extends HeadAudio {
 
   togglePower () {
     this.isOn = !this.isOn;
+  }
+
+  nextTrack () {
+    let nextTrackIndex = this.currentTrackIndex + 1;
+    
+    if ( !this.station.tracks[ nextTrackIndex ] ) {
+      nextTrackIndex = 0;
+    }
+
+    this.selectTrack( nextTrackIndex );
+  }
+
+  prevTrack () {
+    let nextTrackIndex = this.currentTrackIndex - 1;
+    
+    if ( !this.station.tracks[ nextTrackIndex ] ) {
+      nextTrackIndex = this.station.tracks.length - 1;
+    }
+
+    this.selectTrack( nextTrackIndex );
+  }
+
+  selectTrack ( index ) {
+
+    if ( !this.isOn ) { return; }
+
+    this.stop();
+    this.currentTrackIndex = index;
+    this.playTrack();
+    this.emitUpdate();
   }
 
   nextStation () {

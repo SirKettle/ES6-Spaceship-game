@@ -24,9 +24,14 @@
 
 .CanvasMap {
 	position: absolute;
-	bottom: 20px; right: 20px;
+	bottom: 2px; right: 2px;
 	z-index: 4;
 	pointer-events: none;
+    border-radius: 89px 48px 10px 34px;
+    background: black;
+    border-color: black;
+    border-width: 0 18px 0 30px;
+    border-style: solid;
 }
 
 .CanvasGame {

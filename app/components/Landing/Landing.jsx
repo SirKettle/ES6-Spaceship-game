@@ -33,7 +33,7 @@ export default class LandingComponent extends React.Component {
   render () {
 
     return (
-      <div className={ styles.Credits }>
+      <div className={ styles.Landing }>
         Landing page here...
         <h2>Missions</h2>
         { this.renderMissionLinks() }
