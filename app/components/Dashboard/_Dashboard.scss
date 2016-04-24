@@ -12,7 +12,7 @@
 .dash {
 	position: absolute;
 	z-index: 2;
-	left: 0; right: 0; bottom: 0;
+	left: 0; right: 0; bottom: 0; top: 0;
 	background-size: contain;
 }
 
@@ -22,18 +22,46 @@
 	z-index: 1;
 	color: rgba(50, 255, 50, 1);
 	font-family: monospace;
-	font-size: 13px;
+	font-size: 14px;
 	pointer-events: none;
 	opacity: 0.5;
 
 	th, td {
 		text-align: left;
 		padding: 3px 0;
-	    line-height: 25px;
+	    line-height: 28px;
 	}
 
 	th {
 		font-weight: bold;
 		padding-right: 10px;
+	}
+}
+
+.settingsButton {
+	position: absolute;
+	left: -10px; top: -7px;
+	padding: 12px;
+	pointer-events: auto;
+	z-index: 3;
+
+	background-color: #222;
+	color: white;
+	border: solid 2px rgba(255,255,255, 0.2);
+	border-radius: 50%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+
+	&:focus {
+		outline: none;
+		box-shadow: none;
+		border-color: rgba(50, 255, 50, 0.3);
+	}
+
+	&:hover {
+		outline: none;
+		box-shadow: none;
+		border-color: rgba(50, 255, 50, 1);
 	}
 }

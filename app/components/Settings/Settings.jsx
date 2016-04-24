@@ -107,23 +107,23 @@ export default class SettingsComponent extends React.Component {
               onChange={ this.onMuteCheckChanged.bind( this ) }
             />
           </label>
-          <button onClick={ this.increaseMasterVolumeClicked.bind( this ) }>Vol+</button>
           <button onClick={ this.decreaseMasterVolumeClicked.bind( this ) }>Vol-</button>
-          - { this.getMasterVolume() }
+          <button onClick={ this.increaseMasterVolumeClicked.bind( this ) }>Vol+</button>
+          { this.getMasterVolume() }
         </p>
 
         <h3>Sound Effects</h3>
         <p>
-          <button onClick={ this.increaseSfxVolumeClicked.bind( this ) }>Vol+</button>
           <button onClick={ this.decreaseSfxVolumeClicked.bind( this ) }>Vol-</button>
-          - { this.getSfxVolume() }
+          <button onClick={ this.increaseSfxVolumeClicked.bind( this ) }>Vol+</button>
+          { this.getSfxVolume() }
         </p>
 
         <h3>Radio</h3>
         <p>
-          <button onClick={ this.increaseRadioVolumeClicked.bind( this ) }>Vol+</button>
           <button onClick={ this.decreaseRadioVolumeClicked.bind( this ) }>Vol-</button>
-          - { this.getRadioVolume() }
+          <button onClick={ this.increaseRadioVolumeClicked.bind( this ) }>Vol+</button>
+          { this.getRadioVolume() }
         </p>
       </div>
     );

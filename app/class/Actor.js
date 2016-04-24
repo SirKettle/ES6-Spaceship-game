@@ -84,7 +84,11 @@ class Actor {
   }
 
   get audioVolume () {
-    return this.target && gameUtils.getVolumeByDistance( this.state, this.target ) || 1;
+    const volume = this.target && gameUtils.getVolumeByDistance( this.state, this.target );
+    if ( typeof volume === 'number' ) {
+      return volume;
+    }
+    return 1;
   }
 
   get circle () {

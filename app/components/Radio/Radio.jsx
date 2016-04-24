@@ -56,13 +56,13 @@ export default class RadioComponent extends React.Component {
     return (
       <div className={ styles.radio }>
         <div className={ styles.controls }>
-          <button className="power" onClick={ this.onPowerClicked.bind(this) }>{ data && data.isOn ? 'Switch off' : 'Switch on' }</button>
-          <button className="volume-dec" onClick={ this.onVolumeDecreaseClicked.bind(this) }>vol-</button>
-          <button className="volume-inc" onClick={ this.onVolumeIncreaseClicked.bind(this) }>vol+</button>
-          <button className="track-prev" onClick={ this.onPrevTrackClicked.bind(this) }>Tr-</button>
-          <button className="track-next" onClick={ this.onNextTrackClicked.bind(this) }>Tr+</button>
-          <button className="station-prev" onClick={ this.onPrevStationClicked.bind(this) }>Ch-</button>
-          <button className="station-next" onClick={ this.onNextStationClicked.bind(this) }>Ch+</button>
+          <button className="power" onClick={ this.onPowerClicked.bind(this) }>{ data && data.isOn ? '@' : '@' }</button>
+          <button className="volume-dec" onClick={ this.onVolumeDecreaseClicked.bind(this) }>V-</button>
+          <button className="volume-inc" onClick={ this.onVolumeIncreaseClicked.bind(this) }>V+</button>
+          <button className="track-prev" onClick={ this.onPrevTrackClicked.bind(this) }>T-</button>
+          <button className="track-next" onClick={ this.onNextTrackClicked.bind(this) }>T+</button>
+          <button className="station-prev" onClick={ this.onPrevStationClicked.bind(this) }>S-</button>
+          <button className="station-next" onClick={ this.onNextStationClicked.bind(this) }>S+</button>
         </div>
         <div className={ styles.display }>{ data.text.summary }</div>
       </div>

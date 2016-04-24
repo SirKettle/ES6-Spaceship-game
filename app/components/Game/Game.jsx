@@ -60,7 +60,7 @@ export default class GameComponent extends React.Component {
         x: updateCoord( point.x, moveBy.x, canvas.width),
         y: updateCoord( point.y, moveBy.y, canvas.height)
       };
-      canvasUtils.drawCircle(ctx, newPoint.x, newPoint.y, 1, `rgba( 255, 255, 255, ${ opacity } )`);
+      canvasUtils.drawCircle(canvas, ctx, newPoint.x, newPoint.y, 1, `rgba( 255, 255, 255, ${ opacity } )`);
       return newPoint;
     });
   }
@@ -90,7 +90,7 @@ export default class GameComponent extends React.Component {
 
     // Draw the other actors (ie enemy ships, space stations etc)
     actors.forEach( ( actor ) => {
-      canvasUtils.drawThing( ctx, actor, getXPositionOffset( actor, playerShip ), getYPositionOffset( actor, playerShip ), showGuides );
+      canvasUtils.drawThing( canvas, ctx, actor, getXPositionOffset( actor, playerShip ), getYPositionOffset( actor, playerShip ), showGuides );
     });
 
     // Draw our moving grid line guides
@@ -99,21 +99,25 @@ export default class GameComponent extends React.Component {
     }
 
     // Draw our player spaceship
-    canvasUtils.drawThing( ctx, playerShip, getXPositionOffset( playerShip, playerShip ), getYPositionOffset( playerShip, playerShip ), showGuides );
+    canvasUtils.drawThing( canvas, ctx, playerShip, getXPositionOffset( playerShip, playerShip ), getYPositionOffset( playerShip, playerShip ), showGuides );
   }
 
   renderMapCanvas = ( ctx ) => {
     const { map, showMap } = this.props;
 
+    if ( !map || !map.width ) {
+      return;
+    }
+
     // clear the canvas
     ctx.clearRect(0, 0, map.width, map.height);
 
     if ( showMap ) {
-      canvasUtils.drawMap( ctx, map );
+      canvasUtils.drawMap( map, ctx );
     }
   }
 
-  renderSceneryCanvas = ( ctx) => {
+  renderSceneryCanvas = ( ctx ) => {
     // this is where we will give the impression of motion
     // without needing the guides
     // ie,
@@ -121,7 +125,7 @@ export default class GameComponent extends React.Component {
     // 2nd layer - middle distance - moons, planets, stars etc - moving at 1/3 speed
   }
 
-  componentDidMount() {
+  componentDidMount () {
     const { canvas } = this.props;
 
     this.canvases = {

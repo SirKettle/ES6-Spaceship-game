@@ -60,7 +60,7 @@ export default class DashboardComponent extends React.Component {
 
     return (
       <SettingsComponent 
-        onCloseRequested={ this.onToggleSettingsClicked }
+        onCloseRequested={ this.onToggleSettingsClicked.bind( this ) }
       />
     );
   }
@@ -79,8 +79,8 @@ export default class DashboardComponent extends React.Component {
             { this.renderStats() }
           </tbody>
         </table>
-        
-        <button
+
+        <button className={ styles.settingsButton }
           onClick={ this.onToggleSettingsClicked.bind( this ) }
         >Settings</button>
 

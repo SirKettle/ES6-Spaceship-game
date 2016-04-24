@@ -3,6 +3,27 @@ import gameUtils from './game';
 
 const canvasUtils = {
 
+  isOffCanvas ( canvas, x, y, size ) {
+
+    if ( x < -size ) {
+        return true;
+    }
+
+    if ( x > canvas.width + size ) {
+        return true;
+    }
+
+    if ( y < -size ) {
+        return true;
+    }
+
+    if ( y > canvas.height + size ) {
+        return true;
+    }
+
+    return false;
+  },
+
   drawMovingGrid ( canvas, ctx, hero ) {
     const { x, y } = hero;
     const distance = 150;
@@ -36,20 +57,22 @@ const canvasUtils = {
     ctx.closePath();
   },
 
-  drawMap: ( ctx, map ) => {
+  drawMap: ( map, ctx ) => {
     const shipColor = 'rgba( 250, 100, 100, 1)';
     const friendlyColor = 'rgba( 250, 200, 100, 1)';
 
-    canvasUtils.drawCircle( ctx, map.width * 0.5, map.height * 0.5, 2, '#ffffff' );
+    canvasUtils.drawCircle( map, ctx, map.width * 0.5, map.height * 0.5, 2, '#ffffff' );
 
     (map.ships || []).forEach( ( ship ) => {
         const color = ship.isFriendly ? friendlyColor : shipColor;
-        // canvasUtils.drawCircle( ctx, ship.x, ship.y, 2, color );
-        canvasUtils.drawRect( ctx, ship.x, ship.y, 4, color );
+        if ( canvasUtils.isOffCanvas( map, ship.x, ship.y, 4 ) ) { return; }
+        // canvasUtils.drawCircle( canvas, ctx, ship.x, ship.y, 2, color );
+        canvasUtils.drawRect( map, ctx, ship.x, ship.y, 4, color );
     });
   },
 
-  drawTriangle: ( ctx, x, y, width, color, direction ) => {
+  drawTriangle: ( canvas, ctx, x, y, width, color, direction ) => {
+    if ( canvasUtils.isOffCanvas( canvas, x, y, width ) ) { return; }
     ctx.fillStyle = color;
     ctx.beginPath();
     ctx.moveTo(x - width, y);
@@ -62,16 +85,18 @@ const canvasUtils = {
 
   drawShot: ( canvas, ctx, x, y, direction, size = 10, opacity = 1 ) => {
     const color = `rgba( 0, 255, 0, ${opacity}`;
-    canvasUtils.drawCircle( ctx, x, y, size, color );
+    canvasUtils.drawCircle( canvas, ctx, x, y, size, color );
   },
 
-  drawRect: ( ctx, x, y, size, color = '#000000' ) => {
+  drawRect: ( canvas, ctx, x, y, size, color = '#000000' ) => {
+    if ( canvasUtils.isOffCanvas( canvas, x, y, size ) ) { return; }
     //draw a circle
     ctx.fillStyle = color;
     ctx.fillRect( x, y, size, size );
   },
 
-  drawCircle: ( ctx, x, y, size, color = '#000000' ) => {
+  drawCircle: ( canvas, ctx, x, y, size, color = '#000000' ) => {
+    if ( canvasUtils.isOffCanvas( canvas, x, y, size ) ) { return; }
     //draw a circle
     ctx.fillStyle = color;
     ctx.beginPath();
@@ -80,7 +105,8 @@ const canvasUtils = {
     ctx.fill();
   },
 
-  drawHoop: ( ctx, x, y, size, color = '#000000', strokeSize = 1 ) => {
+  drawHoop: ( canvas, ctx, x, y, size, color = '#000000', strokeSize = 1 ) => {
+    if ( canvasUtils.isOffCanvas( canvas, x, y, size ) ) { return; }
     //draw a circle
     ctx.strokeStyle = color;
     ctx.beginPath();
@@ -90,8 +116,9 @@ const canvasUtils = {
     ctx.stroke();
   },
 
-  drawThing: ( ctx, thing, x, y, showGuides = true ) => {
+  drawThing: ( canvas, ctx, thing, x, y, showGuides = true ) => {
     const { image, circle, direction, targetDirection } = thing;
+    if ( canvasUtils.isOffCanvas( canvas, x, y, thing.size ) ) { return; }
     if ( !image ) {
       console.warn( 'image not found', thing );
       return;
@@ -115,11 +142,12 @@ const canvasUtils = {
     let healthColor = guidesColor;
     if ( thing.health < 1 ) { healthColor = '#ddaa00'; }
     if ( thing.health < 0.5 ) { healthColor = '#ff0000'; }
-    canvasUtils.drawHoop( ctx, center.x, center.y, circle.radius - 5, healthColor, 3);
+    if ( thing.power < 0 ) { healthColor = '#33bbdd'; }
+    canvasUtils.drawHoop( canvas, ctx, center.x, center.y, circle.radius - 5, healthColor, 3);
 
     if ( showGuides ) {
         // todo - make the cross hairs bigger than the circle
-        canvasUtils.drawHoop( ctx, center.x, center.y, circle.radius, guidesColor);
+        canvasUtils.drawHoop( canvas, ctx, center.x, center.y, circle.radius, guidesColor);
         ctx.strokeStyle = guidesColor;
         ctx.beginPath();
         ctx.moveTo( center.x, y - crosshairOffset);
