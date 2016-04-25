@@ -22,7 +22,7 @@ class Ship extends Actor {
       breaking: 450,
       maxSpeed: 800,
       turnSpeed: 90,
-      strafeSpeed: 200,
+      strafeSpeed: 150,
       x: 0,
       y: 0,
       direction: 0,
