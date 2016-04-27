@@ -20,8 +20,15 @@ export const validateNumber = {
 	}
 };
 
+export const validateString = {
+  is: ( test ) => {
+    return typeof test === 'string';
+  }
+};
+
 const validate = {
-	number: validateNumber
+	number: validateNumber,
+  string: validateString
 };
 
 export default validate;
