@@ -9,12 +9,13 @@ import AiShip from '../../class/AiShip';
 import Ship from '../../class/Ship';
 import GameComponent from '../Game/Game';
 import DashboardComponent from '../Dashboard/Dashboard';
-import KeyboardControls from '../../services/KeyboardControls';
+import KeyboardController from '../../services/Keyboard';
 import KeyboardActions from '../../services/KeyboardActions';
 import MissionService from '../../services/Mission';
 import Game from '../../services/Game';
 import gameUtils from '../../util/game';
 import numberUtils from '../../util/number';
+import screenUtils from '../../util/screen';
 
 import playerShipData from '../../data/playerShip.json';
 import harrisonShipData from '../../data/harrisonShip.json';
@@ -330,12 +331,7 @@ export default class MissionComponent extends React.Component {
       settings: missionData.settings
     };
 
-    const canvasConfig = {
-      // width: document.body.clientWidth - 20,
-      // height: document.body.clientHeight - 20
-      width: 1024,
-      height: 768
-    };
+    const canvasConfig = screenUtils.getDimensions();
 
     this.setState({
       canvas: canvasConfig
@@ -358,7 +354,8 @@ export default class MissionComponent extends React.Component {
     this.gameClock = Game.Clock();
     this.gameClock.start();
     // add actions to keyboard events
-    KeyboardControls.bind( this.gameClock, this.getKeyboardActions() );
+    this.KeyboardController = new KeyboardController( this.gameClock, this.getKeyboardActions() );
+    this.KeyboardController.bind();
 
     this.gameClock.addAction( ( delta ) => {
       this.updateGame( delta );
@@ -368,13 +365,7 @@ export default class MissionComponent extends React.Component {
   // react core methods
 
   componentWillMount () {
-
-    const canvasConfig = {
-      // width: document.body.clientWidth,
-      // height: document.body.clientHeight
-      width: 1024,
-      height: 768
-    };
+    const canvasConfig = screenUtils.getDimensions();
 
     this.setState({
       canvas: canvasConfig
@@ -385,6 +376,9 @@ export default class MissionComponent extends React.Component {
 
     this.gameClock.stop();
     this.gameClock = null;
+
+    this.KeyboardController.unbind();
+    this.KeyboardController = null;
 
     this.subscriptions.forEach( ( subscription) => {
       subscription.dispose();
@@ -401,7 +395,7 @@ export default class MissionComponent extends React.Component {
   renderPauseScreen () {
     if ( this.gameClock && !this.gameClock.isRunning ) {
       return (
-        <div className={ styles.Pause }>
+        <div className={ styles.pause }>
           <h2>Mission paused</h2>
           <input ref="inputSaveMission" type="text" />
           <button onClick={ this.onSaveClicked.bind(this) }>Save mission</button>
@@ -412,10 +406,33 @@ export default class MissionComponent extends React.Component {
     return null;
   }
 
+  renderDashboard () {
+
+    if ( screenUtils.isTouch ) { return; }
+
+    return (
+      <DashboardComponent
+        stats={ this.state.stats }
+      />
+    );
+  }
+
+  renderTouchControls () {
+    if ( !screenUtils.isTouch ) { return; }
+
+    return (
+      <div className={ styles.touchPad } />
+      <div className={ styles.touchButtons }>
+        <button>F1</button>
+        <button>F2</button>
+      </div>
+    );
+  }
+
   render () {
 
     return (
-      <div className={ styles.Mission }>
+      <div className={ styles.mission }>
         { this.renderPauseScreen() }
         <GameComponent
           playerShip={ this.state.playerShip }
@@ -428,9 +445,8 @@ export default class MissionComponent extends React.Component {
           canvas={ this.state.canvas }
           onCanvasClicked={ this.onCanvasClicked }
         />
-        <DashboardComponent
-          stats={ this.state.stats }
-        />
+        { this.renderDashboard() }
+        { this.renderTouchControls() }
       </div>
     );
   }
