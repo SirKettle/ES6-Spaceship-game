@@ -85,7 +85,7 @@ const canvasUtils = {
 
   drawShot: ( canvas, ctx, x, y, direction, size = 10, opacity = 1 ) => {
     const color = `rgba( 0, 255, 0, ${opacity}`;
-    canvasUtils.drawCircle( canvas, ctx, x, y, size, color );
+    canvasUtils.drawCircle( canvas, ctx, x, y, size, 'yellow' );
   },
 
   drawRect: ( canvas, ctx, x, y, size, color = '#000000' ) => {
@@ -139,10 +139,12 @@ const canvasUtils = {
     };
 
     // draw the health status
-    let healthColor = guidesColor;
-    if ( thing.health < 1 ) { healthColor = '#ddaa00'; }
-    if ( thing.health < 0.5 ) { healthColor = '#ff0000'; }
+    const health255 = Math.floor(thing.health * 255);
+    const greenPart = health255;
+    const redPart = 255 - health255;
+    let healthColor = `rgb( ${ redPart }, ${ greenPart }, 0 )`;
     if ( thing.power < 0 ) { healthColor = '#33bbdd'; }
+
     canvasUtils.drawHoop( canvas, ctx, center.x, center.y, circle.radius - 5, healthColor, 3);
 
     if ( showGuides ) {
