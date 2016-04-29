@@ -6,6 +6,10 @@ class KeyboardController {
   constructor ( GameClock, keyActions ) {
     this.GameClock = GameClock;
     this.keyActions = keyActions;
+
+    this.onKeyDownBound = this.onKeyDown.bind( this );
+    this.onKeyUpBound = this.onKeyUp.bind( this );
+    this.onBlurBound = this.onBlur.bind( this );
   }
 
   onKeyDown ( event ) {
@@ -50,15 +54,15 @@ class KeyboardController {
 
   bind () {
     this.actionIds = {};
-    window.document.addEventListener( 'keydown', this.onKeyDown, false );
-    window.document.addEventListener( 'keyup', this.onKeyUp, false );
-    window.addEventListener( 'blur', this.onBlur, false );
+    window.document.addEventListener( 'keydown', this.onKeyDownBound, false );
+    window.document.addEventListener( 'keyup', this.onKeyUpBound, false );
+    window.addEventListener( 'blur', this.onBlurBound, false );
   }
 
   unbind () {
-    window.document.removeEventListener( 'keydown', this.onKeyDown, false );
-    window.document.removeEventListener( 'keyup', this.onKeyUp, false );
-    window.removeEventListener( 'blur', this.onBlur, false );
+    window.document.removeEventListener( 'keydown', this.onKeyDownBound, false );
+    window.document.removeEventListener( 'keyup', this.onKeyUpBound, false );
+    window.removeEventListener( 'blur', this.onBlurBound, false );
   }
 }
 
