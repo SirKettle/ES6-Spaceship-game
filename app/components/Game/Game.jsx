@@ -2,6 +2,7 @@ import styles from './_Game.scss';
 import React from 'react';
 import canvasUtils from '../../util/canvas';
 import gameUtils from '../../util/game';
+import screenUtils from '../../util/screen';
 
 // TODO: can we use import here instead?
 require('file?!../../assets/space_bg.jpg');
@@ -149,9 +150,13 @@ export default class GameComponent extends React.Component {
 
   renderScene ( canvases ) {
     this.renderSceneryCanvas( this.contexts.scenery );
-    this.renderMapCanvas( this.contexts.map );
     // could add many levels of this
     this.renderGameCanvas( this.contexts.game );
+
+    
+
+    if ( screenUtils.isTouch ) { return; }
+    this.renderMapCanvas( this.contexts.map );
     this.renderParallax( this.contexts.parallaxForeground, 0.5, this.parallaxCoords[0], 0.9 );
     this.renderParallax( this.contexts.parallaxBackground, 0.1, this.parallaxCoords[1], 0.6 );
   }
