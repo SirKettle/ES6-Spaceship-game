@@ -225,7 +225,8 @@ export default class MissionComponent extends React.Component {
     stats.push({ label: 'Heading', value: numberUtils.toPrecision( this.playerShip.state.direction, 2 ) });
     stats.push({ label: 'Longitude', value: numberUtils.toPrecision( this.playerShip.circle.y, 1 ) });
     stats.push({ label: 'Latitude', value: numberUtils.toPrecision( this.playerShip.circle.x, 1 ) });
-    stats.push({ label: 'F.P.S.', value: this.gameClock.fpsAverage });
+    stats.push({ label: 'FPS avg', value: this.gameClock.fpsAverage });
+    stats.push({ label: 'FPS now', value: this.gameClock.fpsAverage });
 
 
     return stats;
@@ -322,6 +323,10 @@ export default class MissionComponent extends React.Component {
   // missionData could be the initial config or an
   // extended saved game
   loadMission ( missionKey ) {
+
+    this.setState({
+      canvas: screenUtils.getDimensions()
+    });
 
     this.reset();
     const missionData = MissionService.load( missionKey );
