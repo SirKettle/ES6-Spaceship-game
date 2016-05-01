@@ -1,5 +1,6 @@
 import styles from './_Game.scss';
 import React from 'react';
+import classNames from 'classNames';
 import canvasUtils from '../../util/canvas';
 import gameUtils from '../../util/game';
 import screenUtils from '../../util/screen';
@@ -152,13 +153,12 @@ export default class GameComponent extends React.Component {
     this.renderSceneryCanvas( this.contexts.scenery );
     // could add many levels of this
     this.renderGameCanvas( this.contexts.game );
-
-    
-
-    if ( screenUtils.isTouch ) { return; }
     this.renderMapCanvas( this.contexts.map );
+    if ( screenUtils.isTouch ) { return; }
     this.renderParallax( this.contexts.parallaxForeground, 0.5, this.parallaxCoords[0], 0.9 );
     this.renderParallax( this.contexts.parallaxBackground, 0.1, this.parallaxCoords[1], 0.6 );
+
+    
   }
 
   componentDidUpdate() {
@@ -182,7 +182,7 @@ export default class GameComponent extends React.Component {
     };
 
     return (
-      <div className={ styles.Game }
+      <div className={ classNames( styles.Game, styles.Mobile ) }
         style={ inlineStyles }
       >
 

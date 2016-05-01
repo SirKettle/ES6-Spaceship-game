@@ -17,16 +17,45 @@ const getHeight = () => {
 
 const screenUtils = {
 
-  isTouch: isTouchEnabled,
+	isTouch: isTouchEnabled,
 
-  getDimensions: () => {
-    return {
-      // width: screen.width,
-      // height: screen.height
-      width: getWidth(),
-      height: getHeight()
-    }
-  }
+	getDimensions: () => {
+		return {
+			// width: screen.width,
+			// height: screen.height
+			width: getWidth(),
+			height: getHeight()
+		}
+	},
+
+	findPos: () => ( obj ) => {
+		let curleft = 0;
+		let curtop = 0;
+
+		if ( obj.offsetParent ) {
+			do {
+				curleft += obj.offsetLeft;
+				curtop += obj.offsetTop;
+			} while ( obj = obj.offsetParent );
+
+			return {
+				x: curleft - document.body.scrollLeft,
+				y: curtop - document.body.scrollTop
+			};
+		}
+	},
+
+	isTouchInBounds: ( el, touch ) => {
+		if ( !el && !touch ) { return; }
+		const offset = screenUtils.findPos( el );
+		return Boolean(
+			!!offset &&
+			touch.clientX - offset.x > 0 &&
+			touch.clientX - offset.x < parseFloat( el.width ) &&
+			touch.clientY - offset.y > 0 &&
+			touch.clientY - offset.y < parseFloat( el.height )
+		);
+	}
 
 };
 

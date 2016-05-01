@@ -13,6 +13,7 @@ import KeyboardController from '../../services/Keyboard';
 import KeyboardActions from '../../services/KeyboardActions';
 import MissionService from '../../services/Mission';
 import Game from '../../services/Game';
+import touchPad from '../../util/touchPad';
 import gameUtils from '../../util/game';
 import numberUtils from '../../util/number';
 import screenUtils from '../../util/screen';
@@ -71,7 +72,13 @@ export default class MissionComponent extends React.Component {
     score: {
       score: 0
     },
-    map: {}
+    map: {},
+    // all current touch objects
+    touches: [],
+    // target / bool key val pairs - ie { left: true, up: false }
+    targetTouches: {},
+    touchState: 'state touches',
+    nativeTouchState: 'native'
   }
 
   subscriptions = []
@@ -116,6 +123,29 @@ export default class MissionComponent extends React.Component {
   }
 
   updateGame ( delta ) {
+
+    if ( screenUtils.isTouch ) {
+      const touches = this.state.touches;
+      const targetTouches = {};
+
+      Object.keys(touchPad.targets).forEach( ( key ) => {
+        targetTouches[ key ] = touchPad.touches[ key ]( touches );
+      });
+
+      this.setState({
+        targetTouches: targetTouches
+      });
+
+
+      this.setState({ touchState: `update game - targetTouches: ${ JSON.stringify(targetTouches) }` });
+
+      if ( targetTouches.left ) { this.playerShip.turnLeft( delta ); }
+      if ( targetTouches.right ) { this.playerShip.turnRight( delta ); }
+      if ( targetTouches.up ) { this.playerShip.accelerate( delta ); }
+      if ( targetTouches.down ) { this.playerShip.decelerate( delta ); }
+      if ( targetTouches.fire1 ) { this.playerShip.shoot(); }
+      if ( targetTouches.fire2 ) { this.playerShip.bomb(); }
+    }
 
     /* **** GENERATE THINGS **** */
 
@@ -367,10 +397,44 @@ export default class MissionComponent extends React.Component {
     });
   }
 
+  // update state
+
+  addTouch = ( touch ) => {
+    const touches = this.state.touches;
+    this.setState({ nativeTouchState: `addTouch - touch: ${ typeof touch }` });
+    touches.push( { identifier: touch.identifier, pageX: touch.pageX, pageY: touch.pageY } );
+    this.setState({ touches: touches });
+    this.setState({ nativeTouchState: `addTouch - touches: ${ touches.map( touch => JSON.stringify( touch ) ).join(' - ') }` });
+  }
+
+  replaceTouch = ( newTouch ) => {
+    const touches = this.state.touches.map( ( touch ) => {
+      if ( newTouch.identifier === touch.identifier ) {
+        return { identifier: touch.identifier, pageX: newTouch.pageX, pageY: newTouch.pageY };
+      }
+      return touch;
+    });
+
+    this.setState({ touches: touches });
+    this.setState({ nativeTouchState: `replaceTouch - touches: ${ touches.map( touch => JSON.stringify( touch ) ).join(' - ') }` });
+  }
+
+  removeTouch = ( touchToRemove ) => {
+    const touches = this.state.touches.filter( ( touch ) => {
+      return Boolean( touchToRemove.identifier !== touch.identifier );
+    });
+
+    this.setState({ touches: touches });
+    this.setState({ nativeTouchState: `removeTouch - touches: ${ touches.map( touch => JSON.stringify( touch ) ).join(' - ') }` });
+  }
+
   // react core methods
 
   componentWillMount () {
     const canvasConfig = screenUtils.getDimensions();
+
+    // This is breaking mobile!!??
+    // React.initializeTouchEvents(true);
 
     this.setState({
       canvas: canvasConfig
@@ -425,13 +489,103 @@ export default class MissionComponent extends React.Component {
   renderTouchControls () {
     if ( !screenUtils.isTouch ) { return; }
 
+    const getCanvasElement = () => {
+      return this.refs.touchCanvas;
+    };
+
+    const handleStart = ( evt ) => {
+      const el = getCanvasElement();
+      const touches = evt.changedTouches;
+
+      let index = 0;
+      for ( index; index < touches.length; index++ ) {
+        const touch = touches.item( index );
+        this.setState({ nativeTouchState: `handleStart - touch: ${ typeof touch }` });
+        this.addTouch( touch );
+      }
+      evt.preventDefault();
+    };
+
+    const handleMove = ( evt ) => {
+      const el = getCanvasElement();
+      const touches = evt.changedTouches;
+      this.setState({ nativeTouchState: `move - touches: ${ touches.length }` });
+      evt.preventDefault();
+      let index = 0;
+      for ( index; index < touches.length; index++ ) {
+        const touch = touches.item( index );
+        this.replaceTouch( touch );
+      }
+    };
+
+    const handleEnd = ( evt ) => {
+      const el = getCanvasElement();
+      const touches = evt.changedTouches;
+      this.setState({ nativeTouchState: `end - touches: ${ touches.length }` });
+      evt.preventDefault();
+      let index = 0;
+      for ( index; index < touches.length; index++ ) {
+        const touch = touches.item( index );
+        this.removeTouch( touch );
+      };
+    };
+
+    const handleCancel = ( evt ) => {
+      const touches = evt.changedTouches;
+      let index = 0;
+      for ( index; index < touches.length; index++ ) {
+        const touch = touches.item( index );
+        this.setState({ nativeTouchState: `cancel - touches: ${ touches.length }` });
+        this.removeTouch( touch );
+      };
+      evt.preventDefault();
+    };
+
+    let touchLog = 'Touch log:<br>';
+
+    touchLog += this.state.touches.map( ( touch ) => {
+      return `x: ${ touch.pageX } y: ${ touch.pageY }<br>`;
+    }).join('');
+
     return (
-      <div className={ styles.touchPad } />
-      <div className={ styles.touchButtons }>
-        <button>F1</button>
-        <button>F2</button>
+      <div className={ styles.touchCanvas }
+        ref="touchCanvas"
+        onTouchStart={ handleStart.bind( this ) }
+        onTouchMove={ handleMove.bind( this ) }
+        onTouchEnd={ handleEnd.bind( this ) }
+        onTouchCancel={ handleCancel.bind( this ) }
+      >
+        {
+          Object.keys(touchPad.targets).map( ( key ) => {
+            const target = touchPad.targets[ key ];
+            const className = `${ key }Button`;
+            const styles = {
+              top: target.y1,
+              left: target.x1,
+              width: target.x2 - target.x1,
+              height: target.y2 - target.y1,
+              backgroundColor: 'rgba(255,255,255,0.1)'
+            };
+
+            if ( this.state.targetTouches[ key ] ) {
+              styles.backgroundColor = 'rgba(255,255,255,0.2)';
+            }
+
+            return (
+              <div key={ key }
+                className={ className }
+                style={ styles }
+              >{ key }</div>
+            );
+          })
+        }
+        <article className={ styles.touchLog }>
+          <p>{ this.state.nativeTouchState }</p>
+          <p>{ this.state.touchState }</p>
+        </article>
       </div>
     );
+        // <div className={ styles.touchLog } dangerouslySetInnerHTML={ { __html: touchLog } } />
   }
 
   render () {

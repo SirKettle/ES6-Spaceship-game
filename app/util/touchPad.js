@@ -1,25 +1,26 @@
 
+// These need to match the buttons in the touchPad
 export const targets = {
-  left: { x1: 10, x2: 60, y1: 400, y2: 500 },
-  right: { x1: 10, x2: 60, y1: 400, y2: 500 },
-  up: { x1: 10, x2: 60, y1: 400, y2: 500 },
-  down: { x1: 10, x2: 60, y1: 400, y2: 500 },
-  fire1: { x1: 10, x2: 60, y1: 400, y2: 500 },
-  fire2: { x1: 10, x2: 60, y1: 400, y2: 500 }
+  left: { x1: 10, x2: 80, y1: 440, y2: 490 },
+  right: { x1: 90, x2: 160, y1: 440, y2: 490 },
+  up: { x1: 50, x2: 120, y1: 390, y2: 440 },
+  down: { x1: 50, x2: 120, y1: 490, y2: 540 },
+  fire1: { x1: 250, x2: 300, y1: 440, y2: 490 },
+  fire2: { x1: 320, x2: 370, y1: 440, y2: 490 }
 };
 
 
-const touches = {};
+export const touches = {};
 
 Object.keys(targets).forEach( ( key ) => {
   touches[ key ] = ( touchList ) => {
     return touchList.some( ( touch ) => {
-      return touchPad.getIsTouch( touch, targets.left );
+      return touchPad.getIsTouch( touch, targets[ key ] );
     });
   };
 });
 
-export touches;
+
 
 const touchPad = {
   getIsTouch: ( touch, target ) => {
