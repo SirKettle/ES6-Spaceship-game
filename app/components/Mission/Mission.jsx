@@ -127,9 +127,10 @@ export default class MissionComponent extends React.Component {
     if ( screenUtils.isTouch ) {
       const touches = this.state.touches;
       const targetTouches = {};
+      const targets = touchPad.getTargets();
 
-      Object.keys(touchPad.targets).forEach( ( key ) => {
-        targetTouches[ key ] = touchPad.touches[ key ]( touches );
+      Object.keys(targets).forEach( ( key ) => {
+        targetTouches[ key ] = touchPad.touches[ key ]( touches, targets );
       });
 
       this.setState({
@@ -547,6 +548,8 @@ export default class MissionComponent extends React.Component {
       return `x: ${ touch.pageX } y: ${ touch.pageY }<br>`;
     }).join('');
 
+    const targets = touchPad.getTargets();
+
     return (
       <div className={ styles.touchCanvas }
         ref="touchCanvas"
@@ -556,19 +559,19 @@ export default class MissionComponent extends React.Component {
         onTouchCancel={ handleCancel.bind( this ) }
       >
         {
-          Object.keys(touchPad.targets).map( ( key ) => {
-            const target = touchPad.targets[ key ];
+          Object.keys(targets).map( ( key ) => {
+            const target = targets[ key ];
             const className = `${ key }Button`;
             const styles = {
               top: target.y1,
               left: target.x1,
               width: target.x2 - target.x1,
               height: target.y2 - target.y1,
-              backgroundColor: 'rgba(255,255,255,0.1)'
+              backgroundColor: 'rgba( 255, 255, 255, 0.1 )'
             };
 
             if ( this.state.targetTouches[ key ] ) {
-              styles.backgroundColor = 'rgba(255,255,255,0.2)';
+              styles.backgroundColor = 'rgba( 255, 255, 255, 0.2 )';
             }
 
             return (

@@ -157,8 +157,6 @@ export default class GameComponent extends React.Component {
     if ( screenUtils.isTouch ) { return; }
     this.renderParallax( this.contexts.parallaxForeground, 0.5, this.parallaxCoords[0], 0.9 );
     this.renderParallax( this.contexts.parallaxBackground, 0.1, this.parallaxCoords[1], 0.6 );
-
-    
   }
 
   componentDidUpdate() {
@@ -181,8 +179,15 @@ export default class GameComponent extends React.Component {
       // ,backgroundPosition: this.getBackgroundPosition()
     };
 
+    const classes = classNames(
+      styles.Game,
+      {
+        [ styles.Mobile ]: screenUtils.isTouch
+      }
+    )
+
     return (
-      <div className={ classNames( styles.Game, styles.Mobile ) }
+      <div className={ classes }
         style={ inlineStyles }
       >
 
